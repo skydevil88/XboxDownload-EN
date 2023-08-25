@@ -8,7 +8,7 @@ Get Microsoft Store Games download link
 ![Store](doc/Store.gif)
 Web Store：https://xbox.skydevil.xyz
 
-[Download Xbox console game via PC (youtube)](https://www.youtube.com/watch?v=3F499kh_jfk)
+Download Xbox console game via PC: https://www.youtube.com/watch?v=3F499kh_jfk
 
 Service
 ---
