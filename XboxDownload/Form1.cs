@@ -325,9 +325,6 @@ namespace XboxDownload
                         gbMicrosoftStore.Tag = DateTime.Now;
                         cbGameXGP1.Items.Clear();
                         cbGameXGP2.Items.Clear();
-                        flpGameWithGold.Controls.Clear();
-                        lsGamesWithGold.Clear();
-                        lbFreePlayDays = null;
                     }
                     Market market = (Market)cbGameMarket.SelectedItem;
                     string language = market.language;
@@ -344,10 +341,6 @@ namespace XboxDownload
                         cbGameXGP2.Items.Add(new Product("Recently added on Xbox Game Pass (Loading)", "0"));
                         cbGameXGP2.SelectedIndex = 0;
                         ThreadPool.QueueUserWorkItem(delegate { XboxGamePass(2, language); });
-                    }
-                    if (flpGameWithGold.Controls.Count == 0 || lsGamesWithGold.Count == 0 || lbFreePlayDays == null)
-                    {
-                        ThreadPool.QueueUserWorkItem(delegate { GameWithGold(); });
                     }
                     break;
                 case "tabTools":
@@ -2901,180 +2894,10 @@ namespace XboxDownload
             if (butGame.Enabled) ButGame_Click(sender, EventArgs.Empty);
         }
 
-        readonly List<GamesWithGold> lsGamesWithGold = new();
-        LinkLabel? lbFreePlayDays = null;
-        private void GameWithGold()
-        {
-            Task[] tasks = new Task[2];
-            tasks[0] = new Task(() =>
-            {
-                if (lsGamesWithGold.Count == 0)
-                {
-                    string html = ClassWeb.HttpResponseContent("https://www.xbox.com/en-US/live/gold/js/gwg-globalContent.js");
-                    Match result = Regex.Match(Regex.Replace(html, @"globalContentOld.+", "", RegexOptions.Singleline), @"""(?<language>[^""]+)"": \{\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyCopytitlenowgame1"": ""(?<keyCopytitlenowgame1>[^""]+)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyLinknowgame1"": ""(?<keyLinknowgame1>[^""]*)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyCopydatesnowgame1"": ""(?<keyCopydatesnowgame1>[^""]*)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyCopytitlenowgame2"": ""(?<keyCopytitlenowgame2>[^""]+)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyLinknowgame2"": ""(?<keyLinknowgame2>[^""]*)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyCopydatesnowgame2"": ""(?<keyCopydatesnowgame2>[^""]*)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyCopytitlenowgame3"": ""(?<keyCopytitlenowgame3>[^""]+)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyLinknowgame3"": ""(?<keyLinknowgame3>[^""]*)"",\n(\s+""[^""]+"": ""[^""]*"",\n)+\s+""keyCopydatesnowgame3"": ""(?<keyCopydatesnowgame3>[^""]*)""");
-                    while (result.Success)
-                    {
-                        string language = result.Groups["language"].Value.ToLowerInvariant();
-                        string keyCopytitlenowgame1 = result.Groups["keyCopytitlenowgame1"].Value;
-                        string keyCopytitlenowgame2 = result.Groups["keyCopytitlenowgame2"].Value;
-                        string keyCopytitlenowgame3 = result.Groups["keyCopytitlenowgame3"].Value;
-                        string keyLinknowgame1 = result.Groups["keyLinknowgame1"].Value;
-                        string keyLinknowgame2 = result.Groups["keyLinknowgame2"].Value;
-                        string keyLinknowgame3 = result.Groups["keyLinknowgame3"].Value;
-                        string keyCopydatesnowgame1 = result.Groups["keyCopydatesnowgame1"].Value;
-                        string keyCopydatesnowgame2 = result.Groups["keyCopydatesnowgame2"].Value;
-                        string keyCopydatesnowgame3 = result.Groups["keyCopydatesnowgame3"].Value;
-                        if (!string.IsNullOrEmpty(keyLinknowgame1))
-                        {
-                            var game1 = lsGamesWithGold.Where(x => x.Link == keyLinknowgame1).FirstOrDefault();
-                            if (game1 == null)
-                            {
-                                GamesWithGold gamesWithGold = new()
-                                {
-                                    Expire = keyCopydatesnowgame1,
-                                    Link = keyLinknowgame1,
-                                    Title = keyCopytitlenowgame1
-                                };
-                                gamesWithGold.Language.Add(language);
-                                lsGamesWithGold.Add(gamesWithGold);
-                            }
-                            else if (!game1.Language.Contains(language))
-                            {
-                                game1.Language.Add(language);
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(keyLinknowgame2))
-                        {
-                            var game2 = lsGamesWithGold.Where(x => x.Link == keyLinknowgame2).FirstOrDefault();
-                            if (game2 == null)
-                            {
-                                GamesWithGold gamesWithGold = new()
-                                {
-                                    Expire = keyCopydatesnowgame2,
-                                    Link = keyLinknowgame2,
-                                    Title = keyCopytitlenowgame2
-                                };
-                                gamesWithGold.Language.Add(language);
-                                lsGamesWithGold.Add(gamesWithGold);
-                            }
-                            else if (!game2.Language.Contains(language))
-                            {
-                                game2.Language.Add(language);
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(keyLinknowgame3))
-                        {
-                            var game3 = lsGamesWithGold.Where(x => x.Link == keyLinknowgame3).FirstOrDefault();
-                            if (game3 == null)
-                            {
-                                GamesWithGold gamesWithGold = new()
-                                {
-                                    Expire = keyCopydatesnowgame3,
-                                    Link = keyLinknowgame3,
-                                    Title = keyCopytitlenowgame3
-                                };
-                                gamesWithGold.Language.Add(language);
-                                lsGamesWithGold.Add(gamesWithGold);
-                            }
-                            else if (!game3.Language.Contains(language))
-                            {
-                                game3.Language.Add(language);
-                            }
-                        }
-                        result = result.NextMatch();
-                    }
-                }
-            });
-            tasks[1] = new Task(() =>
-            {
-                if (lbFreePlayDays == null)
-                {
-                    string html = ClassWeb.HttpResponseContent("https://news.xbox.com/en-us/tag/free-play-days/");
-                    Match result = Regex.Match(html, @"<h3 class=""feed__title"">\r?\n\s+<a href=""(?<url>https://news\.xbox\.com/en-us/(?<date>\d{4}/\d{2}/\d{2})/[^""]+)"">(?<title>[^<]+)</a>");
-                    if (result.Success)
-                    {
-                        string url = result.Groups["url"].Value.Trim();
-                        string title = Regex.Replace(HttpUtility.HtmlDecode(result.Groups["title"].Value), "^Free Play Days ¨C ", "").Trim();
-                        DateTime dt = DateTime.ParseExact(result.Groups["date"].Value, "yyyy/MM/dd", CultureInfo.CurrentCulture).AddHours(TimeZoneInfo.Local.BaseUtcOffset.Hours + 4);
-                        DateTime monday = dt.AddDays(Convert.ToInt32(1 - Convert.ToInt32(dt.DayOfWeek)) + 7);
-                        lbFreePlayDays = new LinkLabel
-                        {
-                            Text = title + "\n" + dt.ToString("MM/dd") + "(Free Play Days)",
-                            TextAlign = ContentAlignment.TopCenter,
-                            AutoSize = true,
-                            Visible = DateTime.Compare(monday, DateTime.Now) >= 0
-                        };
-                        lbFreePlayDays.Links.Add(0, title.Length, url);
-                        lbFreePlayDays.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkGameWebsite_LinkClicked);
-                    }
-                }
-            });
-            Array.ForEach(tasks, x => x.Start());
-            Task.WaitAll(tasks);
-
-            if (lsGamesWithGold.Count >= 1 || lbFreePlayDays != null)
-            {
-                this.Invoke(new Action(() =>
-                {
-                    flpGameWithGold.Controls.Clear();
-                    if (lsGamesWithGold.Count >= 1)
-                    {
-                        foreach (var item in lsGamesWithGold)
-                        {
-                            LinkLabel lb = new()
-                            {
-                                Tag = item.Language,
-                                Text = item.Title + "\n" + item.Expire.Replace(" ", ""),
-                                TextAlign = ContentAlignment.TopCenter,
-                                AutoSize = true,
-                                Parent = this.flpGameWithGold
-                            };
-                            string keyLinknowgame = item.Link;
-                            if (keyLinknowgame.Contains("www.xbox.com/games/"))
-                                keyLinknowgame = Regex.Replace(keyLinknowgame, @"/games/", "/{0}/games/");
-                            else if (keyLinknowgame.Contains("www.microsoft.com/p/"))
-                                keyLinknowgame = Regex.Replace(keyLinknowgame, @"/p/", "/{0}/p/");
-                            else if (keyLinknowgame.Contains("marketplace.xbox.com/Product/"))
-                                keyLinknowgame = Regex.Replace(keyLinknowgame, @"/Product/", "/{0}/Product/");
-                            lb.Links.Add(0, item.Title.Length, keyLinknowgame);
-                            lb.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkGameWithGold_LinkClicked);
-                        }
-                    }
-                    if (lbFreePlayDays != null)
-                    {
-                        lbFreePlayDays.Parent = this.flpGameWithGold;
-                    }
-                }));
-            }
-        }
-
         private void LinkGameWebsite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             string? url = e.Link.LinkData.ToString();
             if (url != null) Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-        }
-
-        private void LinkGameWithGold_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            LinkLabel? lb = sender as LinkLabel;
-            if (lb?.Tag is not List<string> lsLanguage) return;
-            string language = ((Market)cbGameMarket.SelectedItem).language.ToLowerInvariant();
-            if (!lsLanguage.Contains(language))
-            {
-                foreach (var item in cbGameMarket.Items)
-                {
-                    Market market = (Market)item;
-                    if (lsLanguage.FirstOrDefault(market.language.ToLowerInvariant()) != null)
-                    {
-                        language = market.language.ToLowerInvariant();
-                        cbGameMarket.SelectedItem = item;
-                        break;
-                    }
-                }
-            }
-            string? url = e.Link.LinkData?.ToString();
-            if (url != null) tbGameUrl.Text = string.Format(url, language);
-            if (butGame.Enabled) ButGame_Click(sender, EventArgs.Empty);
         }
 
         private void CbGameBundled_SelectedIndexChanged(object? sender, EventArgs? e)

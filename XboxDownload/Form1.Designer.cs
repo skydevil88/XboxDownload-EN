@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             toolStrip1 = new ToolStrip();
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             tsmUpdate = new ToolStripMenuItem();
@@ -201,6 +201,7 @@
             columnHeader3 = new ColumnHeader();
             columnHeader4 = new ColumnHeader();
             panel6 = new Panel();
+            linkConsoleInstall = new LinkLabel();
             linkAppxAdd = new LinkLabel();
             linkWebPage = new LinkLabel();
             label42 = new Label();
@@ -222,8 +223,6 @@
             linkGameWebsite = new LinkLabel();
             pbGame = new PictureBox();
             gbMicrosoftStore = new GroupBox();
-            flpGameWithGold = new FlowLayoutPanel();
-            label34 = new Label();
             cbGameXGP2 = new ComboBox();
             cbGameXGP1 = new ComboBox();
             tbGameSearch = new TextBox();
@@ -851,9 +850,9 @@
             // 
             // Col_TTL
             // 
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle4.Format = "N0";
-            Col_TTL.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle1.Format = "N0";
+            Col_TTL.DefaultCellStyle = dataGridViewCellStyle1;
             resources.ApplyResources(Col_TTL, "Col_TTL");
             Col_TTL.Name = "Col_TTL";
             Col_TTL.ReadOnly = true;
@@ -861,9 +860,9 @@
             // 
             // Col_RoundtripTime
             // 
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle5.Format = "N0";
-            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle2.Format = "N0";
+            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle2;
             resources.ApplyResources(Col_RoundtripTime, "Col_RoundtripTime");
             Col_RoundtripTime.Name = "Col_RoundtripTime";
             Col_RoundtripTime.ReadOnly = true;
@@ -871,9 +870,9 @@
             // 
             // Col_Speed
             // 
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle6.Format = "N2";
-            Col_Speed.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle3.Format = "N2";
+            Col_Speed.DefaultCellStyle = dataGridViewCellStyle3;
             resources.ApplyResources(Col_Speed, "Col_Speed");
             Col_Speed.Name = "Col_Speed";
             Col_Speed.ReadOnly = true;
@@ -1529,6 +1528,7 @@
             // 
             // panel6
             // 
+            panel6.Controls.Add(linkConsoleInstall);
             panel6.Controls.Add(linkAppxAdd);
             panel6.Controls.Add(linkWebPage);
             panel6.Controls.Add(label42);
@@ -1551,6 +1551,15 @@
             panel6.Controls.Add(pbGame);
             resources.ApplyResources(panel6, "panel6");
             panel6.Name = "panel6";
+            // 
+            // linkConsoleInstall
+            // 
+            resources.ApplyResources(linkConsoleInstall, "linkConsoleInstall");
+            linkConsoleInstall.LinkColor = Color.Red;
+            linkConsoleInstall.Name = "linkConsoleInstall";
+            linkConsoleInstall.TabStop = true;
+            linkConsoleInstall.Tag = "https://www.youtube.com/watch?v=3F499kh_jfk";
+            linkConsoleInstall.LinkClicked += Link_LinkClicked;
             // 
             // linkAppxAdd
             // 
@@ -1681,8 +1690,6 @@
             // 
             // gbMicrosoftStore
             // 
-            gbMicrosoftStore.Controls.Add(flpGameWithGold);
-            gbMicrosoftStore.Controls.Add(label34);
             gbMicrosoftStore.Controls.Add(cbGameXGP2);
             gbMicrosoftStore.Controls.Add(cbGameXGP1);
             gbMicrosoftStore.Controls.Add(tbGameSearch);
@@ -1694,16 +1701,6 @@
             resources.ApplyResources(gbMicrosoftStore, "gbMicrosoftStore");
             gbMicrosoftStore.Name = "gbMicrosoftStore";
             gbMicrosoftStore.TabStop = false;
-            // 
-            // flpGameWithGold
-            // 
-            resources.ApplyResources(flpGameWithGold, "flpGameWithGold");
-            flpGameWithGold.Name = "flpGameWithGold";
-            // 
-            // label34
-            // 
-            resources.ApplyResources(label34, "label34");
-            label34.Name = "label34";
             // 
             // cbGameXGP2
             // 
@@ -1791,7 +1788,7 @@
             resources.ApplyResources(linkLabel4, "linkLabel4");
             linkLabel4.Name = "linkLabel4";
             linkLabel4.TabStop = true;
-            linkLabel4.Tag = "https://origin-a.akamaihd.net/Origin-Client-Download/origin/live/OriginThinSetup.exe";
+            linkLabel4.Tag = "https://origin.uptodown.com/windows/descargar";
             linkLabel4.LinkClicked += Link_LinkClicked;
             // 
             // linkLabel3
@@ -2404,8 +2401,6 @@
         private Label label33;
         private ComboBox cbGameXGP2;
         private ComboBox cbGameXGP1;
-        private FlowLayoutPanel flpGameWithGold;
-        private Label label34;
         private ListView lvGameSearch;
         private LinkLabel linkGameWebsite;
         private PictureBox pbGame;
@@ -2491,5 +2486,6 @@
         private FlowLayoutPanel flpTestUrl;
         private ToolStripMenuItem tsmTeaching;
         private ToolStripMenuItem tsmTeaching1;
+        private LinkLabel linkConsoleInstall;
     }
 }
