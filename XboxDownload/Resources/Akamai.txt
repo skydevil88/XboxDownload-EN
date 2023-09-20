@@ -1,4 +1,4 @@
-###################### Microsoft ######################
+##################### Microsoft ######################
 catalog.gamepass.com
 download.xbox.com		#Xbox360 download domain name
 
@@ -28,6 +28,10 @@ nds-network-nav.ea.com
 *.ak.epicgames.com
 cdn2.epicgames.com
 shared-static-prod.epicgames.com
+
+
+##################### Riot Games #####################
+*.dyn.riotcdn.net
 
 
 ####################### Steam ########################
