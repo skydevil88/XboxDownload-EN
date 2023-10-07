@@ -789,10 +789,32 @@ namespace XboxDownload
                     if (Convert.ToBoolean(dr["Enable"]))
                     {
                         string? hostName = dr["HostName"].ToString()?.Trim().ToLower();
-                        if (!string.IsNullOrEmpty(hostName) && !DnsListen.dicHosts.ContainsKey(hostName) && DnsListen.reHosts.IsMatch(hostName) && IPAddress.TryParse(dr["IPv4"].ToString()?.Trim(), out IPAddress? ip))
+                        if (!string.IsNullOrEmpty(hostName) && IPAddress.TryParse(dr["IPv4"].ToString()?.Trim(), out IPAddress? ip))
                         {
-                            Byte[] ipByte = ip.GetAddressBytes();
-                            DnsListen.dicHosts.AddOrUpdate(hostName, ipByte, (oldkey, oldvalue) => ipByte);
+                            if (hostName.StartsWith("*."))
+                            {
+                                hostName = Regex.Replace(hostName, @"^\*\.", "");
+                                Regex re = new("\\." + hostName.Replace(".", "\\.") + "$");
+                                if (!DnsListen.dicCdnHosts3.ContainsKey(re) && DnsListen.reHosts.IsMatch(hostName))
+                                {
+                                    List<ResouceRecord> lsIp = new()
+                                    {
+                                        new ResouceRecord
+                                        {
+                                            Datas = ip.GetAddressBytes(),
+                                            TTL = 100,
+                                            QueryClass = 1,
+                                            QueryType = QueryType.A
+                                        }
+                                    };
+                                    DnsListen.dicCdnHosts3.TryAdd(re, lsIp);
+                                }
+                            }
+                            else if (!DnsListen.dicHosts.ContainsKey(hostName) && DnsListen.reHosts.IsMatch(hostName))
+                            {
+                                Byte[] ipByte = ip.GetAddressBytes();
+                                DnsListen.dicHosts.TryAdd(hostName, ipByte);
+                            }
                         }
                     }
                 }
@@ -1993,9 +2015,18 @@ namespace XboxDownload
             switch (dgvHosts.Columns[e.ColumnIndex].Name)
             {
                 case "Col_HostName":
-                    if (!string.IsNullOrWhiteSpace(e.FormattedValue.ToString()))
+                    string? hostName = e.FormattedValue.ToString()?.Trim();
+                    if (!string.IsNullOrEmpty(hostName))
                     {
-                        if (!DnsListen.reHosts.IsMatch(Regex.Replace((e.FormattedValue.ToString() ?? string.Empty).Trim().ToLower(), @"^(https?://)?([^/|:|\s]+).*$", "$2")))
+                        if (hostName.StartsWith("*."))
+                        {
+                            if (!DnsListen.reHosts.IsMatch(Regex.Replace(hostName, @"^\*\.", "")))
+                            {
+                                e.Cancel = true;
+                                dgvHosts.Rows[e.RowIndex].ErrorText = "Incorrect Hostname";
+                            }
+                        }
+                        else if (!DnsListen.reHosts.IsMatch(Regex.Replace((e.FormattedValue.ToString() ?? string.Empty).Trim().ToLower(), @"^(https?://)?([^/|:|\s]+).*$", "$2")))
                         {
                             e.Cancel = true;
                             dgvHosts.Rows[e.RowIndex].ErrorText = "Incorrect Hostname";
@@ -2231,16 +2262,6 @@ namespace XboxDownload
                             if (DnsListen.reHosts.IsMatch(hosts) && !lsHostsTmp.Contains(hosts))
                             {
                                 lsHostsTmp.Add(hosts);
-                                DnsListen.dicCdnHosts2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
-                            }
-                        }
-                        else if (hosts.StartsWith("*"))
-                        {
-                            hosts = Regex.Replace(hosts, @"^\*", "");
-                            if (DnsListen.reHosts.IsMatch(hosts) && !lsHostsTmp.Contains(hosts))
-                            {
-                                lsHostsTmp.Add(hosts);
-                                DnsListen.dicCdnHosts1.TryAdd(hosts, lsIp);
                                 DnsListen.dicCdnHosts2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
                             }
                         }
