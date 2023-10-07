@@ -133,7 +133,7 @@ namespace XboxDownload
                 string json = File.ReadAllText(resourcePath + "\\Akamai.txt");
                 tbHosts2Akamai.Text = json.Trim() + "\r\n";
             }
-            SetCdnHosts();
+            SetCdn();
 
             cbSpeedTestTimeOut.SelectedIndex = 0;
             cbImportIP.SelectedIndex = 0;
@@ -773,7 +773,8 @@ namespace XboxDownload
         {
             if (add)
             {
-                DnsListen.dicHosts.Clear();
+                DnsListen.dicHosts1.Clear();
+                DnsListen.dicHosts2.Clear();
                 DataTable dt = dtHosts.Clone();
                 if (File.Exists(resourcePath + "\\Hosts.xml"))
                 {
@@ -795,7 +796,7 @@ namespace XboxDownload
                             {
                                 hostName = Regex.Replace(hostName, @"^\*\.", "");
                                 Regex re = new("\\." + hostName.Replace(".", "\\.") + "$");
-                                if (!DnsListen.dicCdnHosts3.ContainsKey(re) && DnsListen.reHosts.IsMatch(hostName))
+                                if (!DnsListen.dicHosts2.ContainsKey(re) && DnsListen.reHosts.IsMatch(hostName))
                                 {
                                     List<ResouceRecord> lsIp = new()
                                     {
@@ -807,13 +808,22 @@ namespace XboxDownload
                                             QueryType = QueryType.A
                                         }
                                     };
-                                    DnsListen.dicCdnHosts3.TryAdd(re, lsIp);
+                                    DnsListen.dicHosts2.TryAdd(re, lsIp);
                                 }
                             }
-                            else if (!DnsListen.dicHosts.ContainsKey(hostName) && DnsListen.reHosts.IsMatch(hostName))
+                            else if (!DnsListen.dicHosts1.ContainsKey(hostName) && DnsListen.reHosts.IsMatch(hostName))
                             {
-                                Byte[] ipByte = ip.GetAddressBytes();
-                                DnsListen.dicHosts.TryAdd(hostName, ipByte);
+                                List<ResouceRecord> lsIp = new()
+                                {
+                                    new ResouceRecord
+                                    {
+                                        Datas = ip.GetAddressBytes(),
+                                        TTL = 100,
+                                        QueryClass = 1,
+                                        QueryType = QueryType.A
+                                    }
+                                };
+                                DnsListen.dicHosts1.TryAdd(hostName, lsIp);
                             }
                         }
                     }
@@ -929,11 +939,12 @@ namespace XboxDownload
                             sb.AppendLine(Properties.Settings.Default.BattleIP + " blzddist3-a.akamaihd.net");
                         }
                     }
-                    foreach (var host in DnsListen.dicHosts)
+                    foreach (var item in DnsListen.dicHosts1)
                     {
-                        if (host.Key == Environment.MachineName)
+                        if (item.Key == Environment.MachineName)
                             continue;
-                        sb.AppendLine(string.Format("{0}.{1}.{2}.{3} {4}", host.Value[0], host.Value[1], host.Value[2], host.Value[3], host.Key));
+                        byte[]? b = item.Value[0].Datas;
+                        if (b != null) sb.AppendLine(string.Format(new IPAddress(b) + " " + item.Key));
                     }
                     sb.AppendLine("# End of XboxDownload");
                     sHosts = sb.ToString() + sHosts;
@@ -958,10 +969,19 @@ namespace XboxDownload
                     while (result.Success)
                     {
                         string hostName = result.Groups["hosts"].Value.Trim().ToLower();
-                        if (!DnsListen.dicHosts.ContainsKey(hostName) && DnsListen.reHosts.IsMatch(hostName) && IPAddress.TryParse(result.Groups["ip"].Value, out IPAddress? ip))
+                        if (!DnsListen.dicHosts1.ContainsKey(hostName) && DnsListen.reHosts.IsMatch(hostName) && IPAddress.TryParse(result.Groups["ip"].Value, out IPAddress? ip))
                         {
-                            byte[] byteIp = ip.GetAddressBytes();
-                            DnsListen.dicHosts.AddOrUpdate(hostName, byteIp, (oldkey, oldvalue) => byteIp);
+                            List<ResouceRecord> lsIp = new()
+                            {
+                                new ResouceRecord
+                                {
+                                    Datas = ip.GetAddressBytes(),
+                                    TTL = 100,
+                                    QueryClass = 1,
+                                    QueryType = QueryType.A
+                                }
+                            };
+                            DnsListen.dicHosts1.TryAdd(hostName, lsIp);
                         }
                         result = result.NextMatch();
                     }
@@ -2198,12 +2218,20 @@ namespace XboxDownload
         {
             if (sender != null)
             {
-                SaveHosts("Akamai.txt", tbHosts2Akamai.Text);
+                if (string.IsNullOrWhiteSpace(tbHosts2Akamai.Text))
+                {
+                    if (File.Exists(resourcePath + "\\" + "Akamai.txt")) File.Delete(resourcePath + "\\" + "Akamai.txt");
+                }
+                else
+                {
+                    if (!Directory.Exists(resourcePath)) Directory.CreateDirectory(resourcePath);
+                    File.WriteAllText(resourcePath + "\\" + "Akamai.txt", tbHosts2Akamai.Text.Trim() + "\r\n");
+                }
                 Properties.Settings.Default.IpsAkamai = tbCdnAkamai.Text;
                 Properties.Settings.Default.EnableCdnIP = ckbEnableCdnIP.Checked;
                 Properties.Settings.Default.Save();
             }
-            SetCdnHosts();
+            SetCdn();
         }
 
         private void ButCdnReset_Click(object sender, EventArgs e)
@@ -2218,10 +2246,10 @@ namespace XboxDownload
             ckbEnableCdnIP.Checked = Properties.Settings.Default.EnableCdnIP;
         }
 
-        private void SetCdnHosts()
+        private void SetCdn()
         {
-            DnsListen.dicCdnHosts1.Clear();
-            DnsListen.dicCdnHosts2.Clear();
+            DnsListen.dicCdn1.Clear();
+            DnsListen.dicCdn2.Clear();
 
             if (Properties.Settings.Default.EnableCdnIP)
             {
@@ -2262,12 +2290,12 @@ namespace XboxDownload
                             if (DnsListen.reHosts.IsMatch(hosts) && !lsHostsTmp.Contains(hosts))
                             {
                                 lsHostsTmp.Add(hosts);
-                                DnsListen.dicCdnHosts2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
+                                DnsListen.dicCdn2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
                             }
                         }
                         else if (DnsListen.reHosts.IsMatch(hosts))
                         {
-                            DnsListen.dicCdnHosts1.TryAdd(hosts, lsIp);
+                            DnsListen.dicCdn1.TryAdd(hosts, lsIp);
                         }
                     }
                     foreach (string str in Regex.Replace(hosts2, @"\#[^\r\n]+", "").Split('\n'))
@@ -2279,7 +2307,7 @@ namespace XboxDownload
                             if (DnsListen.reHosts.IsMatch(hosts) && !lsHostsTmp.Contains(hosts))
                             {
                                 lsHostsTmp.Add(hosts);
-                                DnsListen.dicCdnHosts2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
+                                DnsListen.dicCdn2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
                             }
                         }
                         else if (hosts.StartsWith("*"))
@@ -2288,32 +2316,16 @@ namespace XboxDownload
                             if (DnsListen.reHosts.IsMatch(hosts) && !lsHostsTmp.Contains(hosts))
                             {
                                 lsHostsTmp.Add(hosts);
-                                DnsListen.dicCdnHosts1.TryAdd(hosts, lsIp);
-                                DnsListen.dicCdnHosts2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
+                                DnsListen.dicCdn1.TryAdd(hosts, lsIp);
+                                DnsListen.dicCdn2.TryAdd(new Regex("\\." + hosts.Replace(".", "\\.") + "$"), lsIp);
                             }
                         }
                         else if (DnsListen.reHosts.IsMatch(hosts))
                         {
-                            DnsListen.dicCdnHosts1.TryAdd(hosts, lsIp);
+                            DnsListen.dicCdn1.TryAdd(hosts, lsIp);
                         }
                     }
                 }
-            }
-        }
-
-        private static void SaveHosts(string filename, string hosts)
-        {
-            if (string.IsNullOrWhiteSpace(hosts))
-            {
-                if (File.Exists(resourcePath + "\\" + filename))
-                {
-                    File.Delete(resourcePath + "\\" + filename);
-                }
-            }
-            else
-            {
-                if (!Directory.Exists(resourcePath)) Directory.CreateDirectory(resourcePath);
-                File.WriteAllText(resourcePath + "\\" + filename, hosts.Trim() + "\r\n");
             }
         }
         #endregion
