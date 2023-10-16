@@ -67,7 +67,7 @@ namespace XboxDownload
             toolTip1.SetToolTip(this.labelEA, "EA games download domain name\norigin-a.akamaihd.net");
             toolTip1.SetToolTip(this.labelBattle, "Blzddist games download domain name\nblzddist1-a.akamaihd.net\nblzddist2-a.akamaihd.net\nblzddist3-a.akamaihd.net");
             toolTip1.SetToolTip(this.ckbDoH, Thread.CurrentThread.CurrentCulture.Name != "zh-CN" ? "Use Google DNS over HTTPS (8.8.8.8) to resolve domain name IP." : "Use Alidns DNS over HTTPS (223.5.5.5) to resolve domain name IP.");
-            toolTip1.SetToolTip(this.ckbSetDns, "Start listening, will set the computer DNS to the local IP,\nRestore original settings after stop listening,\nconsole players no need to set.");
+            toolTip1.SetToolTip(this.ckbSetDns, "Start listening, will set the computer DNS to the local IP and disable IPv6,\nRestore automatic settings after stop listening,\nconsole players no need to set.");
 
             tbDnsIP.Text = Properties.Settings.Default.DnsIP;
             tbGameIP.Text = Properties.Settings.Default.GameIP;
@@ -451,7 +451,7 @@ namespace XboxDownload
                 butStart.Enabled = false;
                 bServiceFlag = false;
                 AddHosts(false);
-                if (Properties.Settings.Default.SetDns) ClassDNS.SetNetworkAdapter(null, null, null, Array.Empty<string>());
+                if (Properties.Settings.Default.SetDns) ClassDNS.SetDns(null);
                 if (string.IsNullOrEmpty(Properties.Settings.Default.DnsIP)) tbDnsIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.GameIP)) tbGameIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.AppIP)) tbAppIP.Clear();
@@ -743,6 +743,14 @@ namespace XboxDownload
                         control.Enabled = false;
                 }
                 cbLocalIP.Enabled = false;
+                Task.Run(() =>
+                {
+                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://ipv6.lookup.test-ipv6.com/", "PUT");
+                    if (response != null && response.IsSuccessStatusCode)
+                    {
+                        SaveLog("Notes", "Detected it's using with IPv6, if connect Xbox, disable IPv6 through the router.", "localhost", 0x0000FF);
+                    }
+                });
                 AddHosts(true);
                 if (Properties.Settings.Default.MicrosoftStore) ThreadPool.QueueUserWorkItem(delegate { RestartService("DoSvc"); });
                 if (Properties.Settings.Default.DnsService)
@@ -944,7 +952,7 @@ namespace XboxDownload
                         if (item.Key == Environment.MachineName)
                             continue;
                         byte[]? b = item.Value[0].Datas;
-                        if (b != null) sb.AppendLine(string.Format(new IPAddress(b) + " " + item.Key));
+                        if (b != null) sb.AppendLine(new IPAddress(b) + " " + item.Key);
                     }
                     sb.AppendLine("# End of XboxDownload");
                     sHosts = sb.ToString() + sHosts;

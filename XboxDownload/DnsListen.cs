@@ -19,7 +19,6 @@ namespace XboxDownload
         public static Regex reHosts = new(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$");
         public static ConcurrentDictionary<String, List<ResouceRecord>> dicHosts1 = new(), dicCdn1 = new();
         public static ConcurrentDictionary<Regex, List<ResouceRecord>> dicHosts2 = new(), dicCdn2 = new();
-        public static ConcurrentDictionary<String, String[]> dicDns = new();
 
         Socket? socket = null;
 
@@ -32,25 +31,6 @@ namespace XboxDownload
         public void Listen()
         {
             NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up).ToArray();
-            if (Properties.Settings.Default.SetDns)
-            {
-                dicDns.Clear();
-                using var key = Microsoft.Win32.Registry.LocalMachine;
-                foreach (NetworkInterface adapter in adapters)
-                {
-                    var rk = key.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\" + adapter.Id);
-                    if (rk != null)
-                    {
-                        string? dns = rk.GetValue("NameServer", null) as string;
-                        if (!string.IsNullOrEmpty(dns) && dns != Properties.Settings.Default.LocalIP)
-                        {
-                            string[] dnsArray = dns.Split(',');
-                            dicDns.TryAdd(adapter.GetPhysicalAddress().ToString().ToUpper(), dnsArray);
-                        }
-                        rk.Close();
-                    }
-                }
-            }
             int port = 53;
             IPEndPoint? iPEndPoint = null;
             if (string.IsNullOrEmpty(Properties.Settings.Default.DnsIP))
@@ -199,7 +179,7 @@ namespace XboxDownload
                     }
                 });
             }
-            if (Properties.Settings.Default.SetDns) ClassDNS.SetNetworkAdapter(null, null, null, new string[] { Properties.Settings.Default.LocalIP });
+            if (Properties.Settings.Default.SetDns) ClassDNS.SetDns(Properties.Settings.Default.LocalIP);
             while (Form1.bServiceFlag)
             {
                 try
@@ -712,38 +692,31 @@ namespace XboxDownload
 
     internal class ClassDNS
     {
-        public static void SetNetworkAdapter(string[]? ip, string[]? submask, string[]? getway, string[]? dns)
+        public static void SetDns(string? dns)
         {
-            ManagementClass wmi = new("Win32_NetworkAdapterConfiguration");
-            ManagementObjectCollection moc = wmi.GetInstances();
-            ManagementBaseObject inPar;
-            ManagementBaseObject outPar;
-            InvokeMethodOptions methodOptions = new();
-            foreach (ManagementObject mo in moc.Cast<ManagementObject>())
+            try
             {
-                if (!(bool)mo["IPEnabled"])
-                    continue;
-                if (ip != null && submask != null)
+                using Process p = new();
+                p.StartInfo.FileName = @"powershell.exe";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardInput = true;
+                p.StartInfo.CreateNoWindow = true;
+                p.Start();
+                if (string.IsNullOrEmpty(dns))
                 {
-                    inPar = mo.GetMethodParameters("EnableStatic");
-                    inPar["IPAddress"] = ip;
-                    inPar["SubnetMask"] = submask;
-                    outPar = mo.InvokeMethod("EnableStatic", inPar, methodOptions);
+                    p.StandardInput.WriteLine("enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6");
+                    p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ResetServerAddresses");
                 }
-                if (getway != null)
+                else
                 {
-                    inPar = mo.GetMethodParameters("SetGateways");
-                    inPar["DefaultIPGateway"] = getway;
-                    outPar = mo.InvokeMethod("SetGateways", inPar, methodOptions);
+                    p.StandardInput.WriteLine("disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6");
+                    p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ServerAddresses ('" + dns + "')");
                 }
-                if (dns != null)
-                {
-                    inPar = mo.GetMethodParameters("SetDNSServerSearchOrder");
-                    if (dns.Length == 0)
-                        DnsListen.dicDns.TryGetValue(mo["MacAddress"].ToString()?.Replace(":", "").ToUpper() ?? string.Empty, out dns);
-                    inPar["DNSServerSearchOrder"] = dns ?? Array.Empty<string>();
-                    outPar = mo.InvokeMethod("SetDNSServerSearchOrder", inPar, methodOptions);
-                }
+                p.StandardInput.WriteLine("exit");
+            }
+            catch (Exception ex)
+            {
+                if (!string.IsNullOrEmpty(dns)) MessageBox.Show("Set up local DNS fail, message：" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
