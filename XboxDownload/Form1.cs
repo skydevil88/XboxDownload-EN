@@ -748,7 +748,7 @@ namespace XboxDownload
                     using HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://ipv6.lookup.test-ipv6.com/", "PUT");
                     if (response != null && response.IsSuccessStatusCode)
                     {
-                        SaveLog("Notes", "Detected it's using with IPv6, if connect Xbox, disable IPv6 through the router.", "localhost", 0x0000FF);
+                        SaveLog("Notes", "Detected it's using with IPv6, if connect Xbox console, disable IPv6 through the router.", "localhost", 0x0000FF);
                     }
                 });
                 AddHosts(true);

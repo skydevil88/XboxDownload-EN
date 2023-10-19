@@ -7,7 +7,6 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Net.NetworkInformation;
 using System.Data;
-using System.Management;
 
 namespace XboxDownload
 {
