@@ -12,14 +12,14 @@ namespace XboxDownload
 {
     internal class DnsListen
     {
+        Socket? socket = null;
         public static string dohServer = string.Empty;
         private readonly Form1 parentForm;
         private readonly Regex reDoHBlacklist = new("google|youtube|facebook|twitter");
         public static Regex reHosts = new(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$");
         public static ConcurrentDictionary<String, List<ResouceRecord>> dicHosts1 = new(), dicCdn1 = new();
         public static ConcurrentDictionary<Regex, List<ResouceRecord>> dicHosts2 = new(), dicCdn2 = new();
-
-        Socket? socket = null;
+        public static ConcurrentDictionary<String, String> dicDns = new();
 
         public DnsListen(Form1 parentForm)
         {
@@ -29,7 +29,23 @@ namespace XboxDownload
 
         public void Listen()
         {
-            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up).ToArray();
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up && x.NetworkInterfaceType != NetworkInterfaceType.Loopback && (x.NetworkInterfaceType == NetworkInterfaceType.Ethernet || x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && !x.Description.Contains("Virtual")).ToArray();
+            if (Properties.Settings.Default.SetDns)
+            {
+                dicDns.Clear();
+                using var key = Microsoft.Win32.Registry.LocalMachine;
+                foreach (NetworkInterface adapter in adapters)
+                {
+                    var rk = key.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\" + adapter.Id);
+                    if (rk != null)
+                    {
+                        string? dns = rk.GetValue("NameServer", null) as string;
+                        if (dns == Properties.Settings.Default.LocalIP) dns = null;
+                        dicDns.TryAdd(adapter.Id, dns ?? string.Empty);
+                        rk.Close();
+                    }
+                }
+            }
             int port = 53;
             IPEndPoint? iPEndPoint = null;
             if (string.IsNullOrEmpty(Properties.Settings.Default.DnsIP))
@@ -693,6 +709,18 @@ namespace XboxDownload
     {
         public static void SetDns(string? dns)
         {
+            using (var key = Microsoft.Win32.Registry.LocalMachine)
+            {
+                foreach (var item in DnsListen.dicDns)
+                {
+                    var rk = key.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\" + item.Key);
+                    if (rk != null)
+                    {
+                        rk.SetValue("NameServer", string.IsNullOrEmpty(dns) ? item.Value : dns);
+                        rk.Close();
+                    }
+                }
+            }
             try
             {
                 using Process p = new();
@@ -704,19 +732,16 @@ namespace XboxDownload
                 if (string.IsNullOrEmpty(dns))
                 {
                     p.StandardInput.WriteLine("enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6");
-                    p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ResetServerAddresses");
+                    //p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ResetServerAddresses");
                 }
                 else
                 {
                     p.StandardInput.WriteLine("disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6");
-                    p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ServerAddresses ('" + dns + "')");
+                    //p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ServerAddresses ('" + dns + "')");
                 }
                 p.StandardInput.WriteLine("exit");
             }
-            catch (Exception ex)
-            {
-                if (!string.IsNullOrEmpty(dns)) MessageBox.Show("Set up local DNS fail, message：" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch { }
         }
 
         public static string? HostToIP(string hostName, string? dnsServer = null)
