@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             toolStrip1 = new ToolStrip();
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             tsmUpdate = new ToolStripMenuItem();
@@ -43,7 +43,6 @@
             tsmTeaching = new ToolStripMenuItem();
             tsmTeaching1 = new ToolStripMenuItem();
             tsmAbout = new ToolStripMenuItem();
-            toolStripButton1 = new ToolStripButton();
             tabControl1 = new TabControl();
             tabService = new TabPage();
             groupBox11 = new GroupBox();
@@ -334,7 +333,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2, toolStripButton1 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2 });
             resources.ApplyResources(toolStrip1, "toolStrip1");
             toolStrip1.Name = "toolStrip1";
             // 
@@ -396,14 +395,6 @@
             tsmAbout.Name = "tsmAbout";
             resources.ApplyResources(tsmAbout, "tsmAbout");
             tsmAbout.Click += TsmAbout_Click;
-            // 
-            // toolStripButton1
-            // 
-            toolStripButton1.Alignment = ToolStripItemAlignment.Right;
-            toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            resources.ApplyResources(toolStripButton1, "toolStripButton1");
-            toolStripButton1.Name = "toolStripButton1";
-            toolStripButton1.Click += TsmAbout_Click;
             // 
             // tabControl1
             // 
@@ -850,9 +841,9 @@
             // 
             // Col_TTL
             // 
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle1.Format = "N0";
-            Col_TTL.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle4.Format = "N0";
+            Col_TTL.DefaultCellStyle = dataGridViewCellStyle4;
             resources.ApplyResources(Col_TTL, "Col_TTL");
             Col_TTL.Name = "Col_TTL";
             Col_TTL.ReadOnly = true;
@@ -860,9 +851,9 @@
             // 
             // Col_RoundtripTime
             // 
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle2.Format = "N0";
-            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.Format = "N0";
+            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle5;
             resources.ApplyResources(Col_RoundtripTime, "Col_RoundtripTime");
             Col_RoundtripTime.Name = "Col_RoundtripTime";
             Col_RoundtripTime.ReadOnly = true;
@@ -870,9 +861,9 @@
             // 
             // Col_Speed
             // 
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle3.Format = "N2";
-            Col_Speed.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle6.Format = "N2";
+            Col_Speed.DefaultCellStyle = dataGridViewCellStyle6;
             resources.ApplyResources(Col_Speed, "Col_Speed");
             Col_Speed.Name = "Col_Speed";
             Col_Speed.ReadOnly = true;
@@ -2240,7 +2231,6 @@
         private TabPage tabHosts;
         private ToolStripMenuItem tsmProductManual;
         private ToolStripMenuItem tsmAbout;
-        private ToolStripButton toolStripButton1;
         private TabPage tabSpeedTest;
         private ContextMenuStrip contextMenuStrip1;
         private ToolStripMenuItem tsmiShow;

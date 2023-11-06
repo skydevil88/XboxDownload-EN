@@ -17,15 +17,5 @@ namespace XboxDownload
             string url = ((LinkLabel)sender).Text;
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
-
-        private void LinkCopyBTC_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            Clipboard.SetDataObject(labBTC.Text);
-        }
-
-        private void LinkCopyETH_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            Clipboard.SetDataObject(labETH.Text);
-        }
     }
 }
