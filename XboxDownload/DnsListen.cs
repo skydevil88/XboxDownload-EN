@@ -747,8 +747,13 @@ namespace XboxDownload
             string? ip = null;
             if (string.IsNullOrEmpty(dnsServer))
             {
-                IPAddress[] ipAddresses = Array.FindAll(Dns.GetHostEntry(hostName).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
-                if (ipAddresses.Length >= 1) ip = ipAddresses[0].ToString();
+                IPAddress[]? ipAddresses = null;
+                try
+                {
+                    ipAddresses = Array.FindAll(Dns.GetHostEntry(hostName).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
+                }
+                catch { }
+                if (ipAddresses != null && ipAddresses.Length >= 1) ip = ipAddresses[0].ToString();
             }
             else
             {

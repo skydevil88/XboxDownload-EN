@@ -103,8 +103,19 @@ namespace XboxDownload
 
             tbIpLocation.Text = Properties.Settings.Default.IpLocation;
 
-            IPAddress[] ipAddresses = Array.FindAll(Dns.GetHostEntry(string.Empty).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
-            cbLocalIP.Items.AddRange(ipAddresses);
+            //IPAddress[] ipAddresses = Array.FindAll(Dns.GetHostEntry(string.Empty).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
+            //cbLocalIP.Items.AddRange(ipAddresses);
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up && x.NetworkInterfaceType != NetworkInterfaceType.Loopback && (x.NetworkInterfaceType == NetworkInterfaceType.Ethernet || x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && !x.Description.Contains("Virtual")).ToArray();
+            foreach (NetworkInterface adapter in adapters)
+            {
+                IPInterfaceProperties adapterProperties = adapter.GetIPProperties();
+                UnicastIPAddressInformationCollection ipCollection = adapterProperties.UnicastAddresses;
+                foreach (UnicastIPAddressInformation ipadd in ipCollection)
+                {
+                    if (ipadd.Address.AddressFamily == AddressFamily.InterNetwork)
+                        cbLocalIP.Items.Add(ipadd.Address.ToString());
+                }
+            }
             if (cbLocalIP.Items.Count >= 1)
             {
                 int index = 0;
@@ -450,7 +461,7 @@ namespace XboxDownload
             {
                 butStart.Enabled = false;
                 bServiceFlag = false;
-                AddHosts(false);
+                UpdateHosts(false);
                 if (Properties.Settings.Default.SetDns) ClassDNS.SetDns(null);
                 if (string.IsNullOrEmpty(Properties.Settings.Default.DnsIP)) tbDnsIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.GameIP)) tbGameIP.Clear();
@@ -751,7 +762,7 @@ namespace XboxDownload
                         SaveLog("Notes", "Detected it's using with IPv6, if connect Xbox console, disable IPv6 through the router.", "localhost", 0x0000FF);
                     }
                 });
-                AddHosts(true);
+                UpdateHosts(true);
                 if (Properties.Settings.Default.MicrosoftStore) ThreadPool.QueueUserWorkItem(delegate { RestartService("DoSvc"); });
                 if (Properties.Settings.Default.DnsService)
                 {
@@ -777,7 +788,7 @@ namespace XboxDownload
             butStart.Enabled = true;
         }
 
-        private void AddHosts(bool add)
+        private void UpdateHosts(bool add)
         {
             if (add)
             {
@@ -967,33 +978,6 @@ namespace XboxDownload
             catch (Exception ex)
             {
                 if (add) MessageBox.Show("Failed to modify the system Hosts file, message£º" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            if (add && Properties.Settings.Default.SetDns)
-            {
-                Regex r = new(@"^(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<hosts>[^#]+)");
-                foreach (string str in sb.ToString().Split('\n'))
-                {
-                    Match result = r.Match(str);
-                    while (result.Success)
-                    {
-                        string hostName = result.Groups["hosts"].Value.Trim().ToLower();
-                        if (!DnsListen.dicHosts1.ContainsKey(hostName) && DnsListen.reHosts.IsMatch(hostName) && IPAddress.TryParse(result.Groups["ip"].Value, out IPAddress? ip))
-                        {
-                            List<ResouceRecord> lsIp = new()
-                            {
-                                new ResouceRecord
-                                {
-                                    Datas = ip.GetAddressBytes(),
-                                    TTL = 100,
-                                    QueryClass = 1,
-                                    QueryType = QueryType.A
-                                }
-                            };
-                            DnsListen.dicHosts1.TryAdd(hostName, lsIp);
-                        }
-                        result = result.NextMatch();
-                    }
-                }
             }
         }
 
@@ -2100,7 +2084,7 @@ namespace XboxDownload
                 File.Delete(resourcePath + "\\Hosts.xml");
             }
             dgvHosts.ClearSelection();
-            if (bServiceFlag) AddHosts(true);
+            if (bServiceFlag) UpdateHosts(true);
         }
 
         private void ButHostReset_Click(object sender, EventArgs e)
