@@ -101,7 +101,7 @@ namespace XboxDownload
             {
                 Task.Run(() =>
                 {
-                    string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("xvcf2.xboxlive.com") : ClassDNS.HostToIP("xvcf2.xboxlive.com", Properties.Settings.Default.DnsIP);
+                    string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("xvcf1.xboxlive.com") : ClassDNS.HostToIP("xvcf2.xboxlive.com", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
                     {
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbGameIP, ip);
