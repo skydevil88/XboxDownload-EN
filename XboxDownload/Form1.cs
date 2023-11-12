@@ -483,7 +483,7 @@ namespace XboxDownload
                 httpListen.Close();
                 httpsListen.Close();
                 Program.SystemSleep.RestoreForCurrentThread();
-                if (Properties.Settings.Default.MicrosoftStore) ThreadPool.QueueUserWorkItem(delegate { RestartService("DoSvc"); });
+                if (Properties.Settings.Default.MicrosoftStore) RestartService("DoSvc");
             }
             else
             {
@@ -763,7 +763,7 @@ namespace XboxDownload
                     }
                 });
                 UpdateHosts(true);
-                if (Properties.Settings.Default.MicrosoftStore) ThreadPool.QueueUserWorkItem(delegate { RestartService("DoSvc"); });
+                if (Properties.Settings.Default.MicrosoftStore) RestartService("DoSvc");
                 if (Properties.Settings.Default.DnsService)
                 {
                     linkTestDns.Enabled = true;

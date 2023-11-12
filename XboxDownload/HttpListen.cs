@@ -158,66 +158,83 @@ namespace XboxDownload
                     {
                         bool _redirect = false;
                         string _newHosts = string.Empty;
-                        switch (_hosts)
+                        if (Properties.Settings.Default.GameLink)
                         {
-                            case "xvcf1.xboxlive.com":
-                            case "xvcf2.xboxlive.com":
-                            case "assets1.xboxlive.com":
-                            case "assets2.xboxlive.com":
-                            case "dlassets.xboxlive.com":
-                            case "dlassets2.xboxlive.com":
-                            case "d1.xboxlive.com":
-                            case "d2.xboxlive.com":
-                            case "assets1.xboxlive.cn":
-                            case "assets2.xboxlive.cn":
-                            case "dlassets.xboxlive.cn":
-                            case "dlassets2.xboxlive.cn":
-                            case "d1.xboxlive.cn":
-                            case "d2.xboxlive.cn":
-                                if (Properties.Settings.Default.GameLink)
-                                {
-                                    switch (_hosts)
-                                    {
-                                        case "xvcf1.xboxlive.com":
-                                        case "assets1.xboxlive.com":
-                                        case "d1.xboxlive.com":
-                                        case "assets1.xboxlive.cn":
-                                        case "d1.xboxlive.cn":
-                                            _redirect = true;
-                                            _newHosts = Regex.Replace(_hosts, @"1", "2");
-                                            if (dicFilePath.TryAdd(_filePath, string.Empty))
-                                                ThreadPool.QueueUserWorkItem(delegate { UpdateGameUrl(_hosts, _filePath, _extension); });
-                                            break;
-                                        case "dlassets.xboxlive.com":
-                                        case "dlassets.xboxlive.cn":
-                                            _redirect = true;
-                                            _newHosts = Regex.Replace(_hosts, @"dlassets", "dlassets2");
-                                            if (dicFilePath.TryAdd(_filePath, string.Empty))
-                                                ThreadPool.QueueUserWorkItem(delegate { UpdateGameUrl(_hosts, _filePath, _extension); });
-                                            break;
-                                        default:
-                                            if (dicFilePath.TryAdd(_filePath, string.Empty))
-                                                ThreadPool.QueueUserWorkItem(delegate { UpdateGameUrl(_hosts, _filePath, _extension); });
-                                            break;
-                                    }
-                                }
-                                else
-                                {
+                            switch (_hosts)
+                            {
+                                case "xvcf1.xboxlive.com":
+                                case "assets1.xboxlive.com":
+                                case "d1.xboxlive.com":
+                                case "assets1.xboxlive.cn":
+                                case "d1.xboxlive.cn":
+                                    _redirect = true;
+                                    _newHosts = Regex.Replace(_hosts, @"1", "2");
                                     if (dicFilePath.TryAdd(_filePath, string.Empty))
                                         ThreadPool.QueueUserWorkItem(delegate { UpdateGameUrl(_hosts, _filePath, _extension); });
-                                }
-                                break;
-                            case "us.cdn.blizzard.com":
-                            case "eu.cdn.blizzard.com":
-                            case "kr.cdn.blizzard.com":
-                            case "level3.blizzard.com":
-                                if (Properties.Settings.Default.BattleStore && Properties.Settings.Default.BattleCDN)
-                                {
+                                    break;
+                                case "dlassets.xboxlive.com":
+                                case "dlassets.xboxlive.cn":
                                     _redirect = true;
-                                    _newHosts = "blzddist1-a.akamaihd.net";
-                                }
-                                break;
+                                    _newHosts = Regex.Replace(_hosts, @"dlassets", "dlassets2");
+                                    if (dicFilePath.TryAdd(_filePath, string.Empty))
+                                        ThreadPool.QueueUserWorkItem(delegate { UpdateGameUrl(_hosts, _filePath, _extension); });
+                                    break;
+                                case "xvcf2.xboxlive.com":
+                                case "assets2.xboxlive.com":
+                                case "dlassets2.xboxlive.com":
+                                case "d2.xboxlive.com":
+                                case "assets2.xboxlive.cn":
+                                case "dlassets2.xboxlive.cn":
+                                case "d2.xboxlive.cn":
+                                    if (dicFilePath.TryAdd(_filePath, string.Empty))
+                                        ThreadPool.QueueUserWorkItem(delegate { UpdateGameUrl(_hosts, _filePath, _extension); });
+                                    break;
+                                case "us.cdn.blizzard.com":
+                                case "eu.cdn.blizzard.com":
+                                case "kr.cdn.blizzard.com":
+                                case "level3.blizzard.com":
+                                    if (Properties.Settings.Default.BattleStore && Properties.Settings.Default.BattleCDN)
+                                    {
+                                        _redirect = true;
+                                        _newHosts = "blzddist1-a.akamaihd.net";
+                                    }
+                                    break;
+                            }
                         }
+                        else
+                        {
+                            switch (_hosts)
+                            {
+                                case "xvcf1.xboxlive.com":
+                                case "xvcf2.xboxlive.com":
+                                case "assets1.xboxlive.com":
+                                case "assets2.xboxlive.com":
+                                case "dlassets.xboxlive.com":
+                                case "dlassets2.xboxlive.com":
+                                case "d1.xboxlive.com":
+                                case "d2.xboxlive.com":
+                                case "assets1.xboxlive.cn":
+                                case "assets2.xboxlive.cn":
+                                case "dlassets.xboxlive.cn":
+                                case "dlassets2.xboxlive.cn":
+                                case "d1.xboxlive.cn":
+                                case "d2.xboxlive.cn":
+                                    if (dicFilePath.TryAdd(_filePath, string.Empty))
+                                        ThreadPool.QueueUserWorkItem(delegate { UpdateGameUrl(_hosts, _filePath, _extension); });
+                                    break;
+                                case "us.cdn.blizzard.com":
+                                case "eu.cdn.blizzard.com":
+                                case "kr.cdn.blizzard.com":
+                                case "level3.blizzard.com":
+                                    if (Properties.Settings.Default.BattleStore && Properties.Settings.Default.BattleCDN)
+                                    {
+                                        _redirect = true;
+                                        _newHosts = "blzddist1-a.akamaihd.net";
+                                    }
+                                    break;
+                            }
+                        }
+                        
                         if (_redirect)
                         {
                             string _url = "http://" + _newHosts + _filePath;

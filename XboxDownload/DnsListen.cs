@@ -101,7 +101,7 @@ namespace XboxDownload
             {
                 Task.Run(() =>
                 {
-                    string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("xvcf1.xboxlive.com") : ClassDNS.HostToIP("xvcf1.xboxlive.com", Properties.Settings.Default.DnsIP);
+                    string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("xvcf2.xboxlive.com") : ClassDNS.HostToIP("xvcf2.xboxlive.com", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
                     {
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbGameIP, ip);
@@ -310,7 +310,7 @@ namespace XboxDownload
                                             QueryType = QueryType.A
                                         }
                                     };
-                                    socket.SendTo(dns.ToBytes(), client);
+                                    socket?.SendTo(dns.ToBytes(), client);
                                     if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + (new IPAddress(byteIP)), ((IPEndPoint)client).Address.ToString(), argb);
                                     return;
                                 }
@@ -322,7 +322,7 @@ namespace XboxDownload
                                     dns.RA = 1;
                                     dns.RD = 1;
                                     dns.ResouceRecords = lsResouceRecord;
-                                    socket.SendTo(dns.ToBytes(), client);
+                                    socket?.SendTo(dns.ToBytes(), client);
                                     if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
                                     return;
                                 }
@@ -337,7 +337,7 @@ namespace XboxDownload
                                         dns.RA = 1;
                                         dns.RD = 1;
                                         dns.ResouceRecords = lsResouceRecord;
-                                        socket.SendTo(dns.ToBytes(), client);
+                                        socket?.SendTo(dns.ToBytes(), client);
                                         if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
                                         return;
                                     }
@@ -352,7 +352,7 @@ namespace XboxDownload
                                         dns.RA = 1;
                                         dns.RD = 1;
                                         dns.ResouceRecords = lsResouceRecord;
-                                        socket.SendTo(dns.ToBytes(), client);
+                                        socket?.SendTo(dns.ToBytes(), client);
                                         if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
                                         return;
                                     }
@@ -367,7 +367,7 @@ namespace XboxDownload
                                             dns.RA = 1;
                                             dns.RD = 1;
                                             dns.ResouceRecords = lsResouceRecord;
-                                            socket.SendTo(dns.ToBytes(), client);
+                                            socket?.SendTo(dns.ToBytes(), client);
                                             if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
                                             return;
                                         }
@@ -405,7 +405,7 @@ namespace XboxDownload
                                                         });
                                                     }
                                                 }
-                                                socket.SendTo(dns.ToBytes(), client);
+                                                socket?.SendTo(dns.ToBytes(), client);
                                                 var arrIp = json.Answer.Where(x => x.Type == 1).Select(x => x.Data);
                                                 if (arrIp != null)
                                                 {
@@ -420,7 +420,7 @@ namespace XboxDownload
                             }
                             else // 屏蔽IPv6
                             {
-                                socket.SendTo(Array.Empty<byte>(), client);
+                                socket?.SendTo(Array.Empty<byte>(), client);
                                 return;
                             }
                         }
@@ -431,11 +431,11 @@ namespace XboxDownload
                             proxy.Connect(iPEndPoint);
                             proxy.Send(buff, read);
                             var bytes = proxy.Receive(ref iPEndPoint);
-                            socket.SendTo(bytes, client);
+                            socket?.SendTo(bytes, client);
                         }
                         catch (Exception ex)
                         {
-                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", ex.Message, ((IPEndPoint)client).Address.ToString());
+                            if (Form1.bServiceFlag && Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", ex.Message, ((IPEndPoint)client).Address.ToString());
                         }
                     });
                 }
