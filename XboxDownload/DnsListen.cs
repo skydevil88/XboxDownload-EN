@@ -19,7 +19,14 @@ namespace XboxDownload
         public static Regex reHosts = new(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$");
         public static ConcurrentDictionary<String, List<ResouceRecord>> dicHosts1 = new(), dicCdn1 = new();
         public static ConcurrentDictionary<Regex, List<ResouceRecord>> dicHosts2 = new(), dicCdn2 = new();
-        public static ConcurrentDictionary<String, String> dicDns = new();
+        public static ConcurrentDictionary<String, Dns> dicDns = new();
+
+        public class Dns
+        {
+            public string IPv4 { get; set; } = "";
+
+            public string IPv6 { get; set; } = "";
+        }
 
         public DnsListen(Form1 parentForm)
         {
@@ -36,14 +43,24 @@ namespace XboxDownload
                 using var key = Microsoft.Win32.Registry.LocalMachine;
                 foreach (NetworkInterface adapter in adapters)
                 {
-                    var rk = key.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\" + adapter.Id);
-                    if (rk != null)
+                    var dns = new Dns();
+                    var rk1 = key.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\" + adapter.Id);
+                    if (rk1 != null)
                     {
-                        string? dns = rk.GetValue("NameServer", null) as string;
-                        if (dns == Properties.Settings.Default.LocalIP) dns = null;
-                        dicDns.TryAdd(adapter.Id, dns ?? string.Empty);
-                        rk.Close();
+                        string? ip = rk1.GetValue("NameServer", null) as string;
+                        if (string.IsNullOrEmpty(ip) || ip == Properties.Settings.Default.LocalIP) ip = "";
+                        dns.IPv4 = ip;
+                        rk1.Close();
                     }
+                    var rk2 = key.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\" + adapter.Id);
+                    if (rk2 != null)
+                    {
+                        string? ip = rk2.GetValue("NameServer", null) as string;
+                        if (string.IsNullOrEmpty(ip) || ip == "::") ip = "";
+                        dns.IPv6 = ip;
+                        rk2.Close();
+                    }
+                    dicDns.TryAdd(adapter.Id, dns);
                 }
             }
             int port = 53;
@@ -466,8 +483,11 @@ namespace XboxDownload
                             }
                             else // 屏蔽IPv6
                             {
-                                socket?.SendTo(Array.Empty<byte>(), client);
-                                return;
+                                dns.QR = 1;
+                                dns.RA = 1;
+                                dns.RD = 1;
+                                dns.ResouceRecords = new List<ResouceRecord>();
+                                socket?.SendTo(dns.ToBytes(), client);
                             }
                         }
                         try
@@ -753,37 +773,22 @@ namespace XboxDownload
 
     internal class ClassDNS
     {
-        public static void SetDns(string? dns)
+        public static void SetDns(string dns)
         {
-            try
-            {
-                using Process p = new();
-                p.StartInfo.FileName = @"powershell.exe";
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.RedirectStandardInput = true;
-                p.StartInfo.CreateNoWindow = true;
-                p.Start();
-                if (string.IsNullOrEmpty(dns))
-                {
-                    p.StandardInput.WriteLine("enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6");
-                    //p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ResetServerAddresses");
-                }
-                else
-                {
-                    p.StandardInput.WriteLine("disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6");
-                    //p.StandardInput.WriteLine("Get-NetAdapter -Physical | Set-DnsClientServerAddress -ServerAddresses ('" + dns + "')");
-                }
-                p.StandardInput.WriteLine("exit");
-            }
-            catch { }
             using var key = Microsoft.Win32.Registry.LocalMachine;
             foreach (var item in DnsListen.dicDns)
             {
-                var rk = key.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\" + item.Key);
-                if (rk != null)
+                var rk1 = key.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\" + item.Key);
+                if (rk1 != null)
                 {
-                    rk.SetValue("NameServer", string.IsNullOrEmpty(dns) ? item.Value : dns);
-                    rk.Close();
+                    rk1.SetValue("NameServer", string.IsNullOrEmpty(dns) ? item.Value.IPv4 : dns);
+                    rk1.Close();
+                }
+                var rk2 = key.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\" + item.Key);
+                if (rk2 != null)
+                {
+                    rk2.SetValue("NameServer", string.IsNullOrEmpty(dns) ? item.Value.IPv6 : "::");
+                    rk2.Close();
                 }
             }
         }

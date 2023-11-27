@@ -166,48 +166,48 @@ namespace XboxDownload
 
             Form1.lsMarket.AddRange((new List<Market>
             {
-                new Market("Argentina", "AR", "es-AR"),
-                new Market("Austalia", "AU", "en-AU"),
-                new Market("Austria", "AT", "de-AT"),
-                new Market("Belgium", "BE", "nl-BE"),
-                new Market("Brazil", "BR", "pt-BR"),
-                new Market("Canada", "CA", "en-CA"),
-                new Market("Chile", "CL", "es-CL"),
-                new Market("China", "CN", "zh-CN"),
-                new Market("Colombia", "CO", "es-CO"),
-                new Market("Czech Republic", "CZ", "cs-CZ"),
-                new Market("Denmark", "DK", "da-DK"),
-                new Market("Finland", "FI", "fi-FI"),
-                new Market("France", "FR", "fr-FR"),
-                new Market("Germany","DE", "de-DE"),
-                new Market("Greece", "GR", "el-GR"),
-                new Market("Hong Kong SAR", "HK", "zh-HK"),
-                new Market("Hungary", "HU", "hu-HU"),
-                new Market("India", "IN", "en-IN"),
-                new Market("Ireland", "IE", "en-IE"),
-                new Market("Israel", "IL", "he-IL"),
-                new Market("Italy", "IT", "it-IT"),
-                new Market("Japan", "JP", "ja-JP"),
-                new Market("Korea", "KR", "ko-KR"),
-                new Market("Mexico", "MX", "es-MX"),
-                new Market("Netherlands", "NL", "nl-NL"),
-                new Market("New Zealand", "NZ", "en-NZ"),
-                new Market("Norway", "NO", "nb-NO"),
-                new Market("Poland", "PL", "pl-PL"),
-                new Market("Portugal", "PT", "pt-PT"),
-                new Market("Russia", "RU", "ru-RU"),
-                new Market("Saudi Arabia", "SA", "ar-SA"),
-                new Market("Singapore", "SG", "en-SG"),
-                new Market("Slovakia", "SK", "sk-SK"),
-                new Market("South Africa", "ZA", "en-ZA"),
-                new Market("Spain", "ES", "es-ES"),
-                new Market("Sweden", "SE", "sv-SE"),
-                new Market("Switzerland", "CH", "de-CH"),
-                new Market("Taiwan", "TW", "zh-TW"),
-                new Market("Turkey", "TR", "tr-TR"),
-                new Market("United Arab Emirates", "AE", "ar-AE"),
-                new Market("United Kingdom", "GB", "en-GB"),
-                new Market("United States", "US", "en-US")
+                new("Argentina", "AR", "es-AR"),
+                new("Austalia", "AU", "en-AU"),
+                new("Austria", "AT", "de-AT"),
+                new("Belgium", "BE", "nl-BE"),
+                new("Brazil", "BR", "pt-BR"),
+                new("Canada", "CA", "en-CA"),
+                new("Chile", "CL", "es-CL"),
+                new("China", "CN", "zh-CN"),
+                new("Colombia", "CO", "es-CO"),
+                new("Czech Republic", "CZ", "cs-CZ"),
+                new("Denmark", "DK", "da-DK"),
+                new("Finland", "FI", "fi-FI"),
+                new("France", "FR", "fr-FR"),
+                new("Germany","DE", "de-DE"),
+                new("Greece", "GR", "el-GR"),
+                new("Hong Kong SAR", "HK", "zh-HK"),
+                new("Hungary", "HU", "hu-HU"),
+                new("India", "IN", "en-IN"),
+                new("Ireland", "IE", "en-IE"),
+                new("Israel", "IL", "he-IL"),
+                new("Italy", "IT", "it-IT"),
+                new("Japan", "JP", "ja-JP"),
+                new("Korea", "KR", "ko-KR"),
+                new("Mexico", "MX", "es-MX"),
+                new("Netherlands", "NL", "nl-NL"),
+                new("New Zealand", "NZ", "en-NZ"),
+                new("Norway", "NO", "nb-NO"),
+                new("Poland", "PL", "pl-PL"),
+                new("Portugal", "PT", "pt-PT"),
+                new("Russia", "RU", "ru-RU"),
+                new("Saudi Arabia", "SA", "ar-SA"),
+                new("Singapore", "SG", "en-SG"),
+                new("Slovakia", "SK", "sk-SK"),
+                new("South Africa", "ZA", "en-ZA"),
+                new("Spain", "ES", "es-ES"),
+                new("Sweden", "SE", "sv-SE"),
+                new("Switzerland", "CH", "de-CH"),
+                new("Taiwan", "TW", "zh-TW"),
+                new("Turkey", "TR", "tr-TR"),
+                new("United Arab Emirates", "AE", "ar-AE"),
+                new("United Kingdom", "GB", "en-GB"),
+                new("United States", "US", "en-US")
             }).ToArray());
             cbGameMarket.Items.AddRange(Form1.lsMarket.ToArray());
             int keyIndex = Form1.lsMarket.FindIndex(x => x.code == RegionInfo.CurrentRegion.Name);
@@ -1243,24 +1243,7 @@ namespace XboxDownload
             if (fi.Exists && fi.Length >= 1) update = DateTime.Compare(DateTime.Now, fi.LastWriteTime.AddHours(24)) >= 0;
             if (update)
             {
-                await Task.Run(() =>
-                {
-                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://raw.githubusercontent.com/skydevil88/XboxDownload-EN/master/IP/" + fi.Name, "GET", null, null, null, 6000);
-                    if (response != null && response.IsSuccessStatusCode)
-                    {
-                        byte[] buffer = response.Content.ReadAsByteArrayAsync().Result;
-                        if (buffer.Length > 0)
-                        {
-                            if (fi.DirectoryName != null && !Directory.Exists(fi.DirectoryName))
-                                Directory.CreateDirectory(fi.DirectoryName);
-                            using FileStream fs = new(fi.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
-                            fs.Write(buffer, 0, buffer.Length);
-                            fs.Flush();
-                            fs.Close();
-                            fi.Refresh();
-                        }
-                    }
-                });
+                await UpdateFile.DownloadIP(fi);
             }
             string content = string.Empty;
             if (fi.Exists)
@@ -2435,7 +2418,7 @@ namespace XboxDownload
             }
         }
 
-        private void ButAnalyze_Click(object sender, EventArgs e)
+        private async void ButAnalyze_Click(object sender, EventArgs e)
         {
             string url = tbDownloadUrl.Text.Trim();
             if (string.IsNullOrEmpty(url)) return;
@@ -2447,8 +2430,10 @@ namespace XboxDownload
             }
 
             tbFilePath.Text = string.Empty;
+            tbContentId.Text = tbProductID.Text = tbBuildID.Text = tbFileTimeCreated.Text = tbDriveSize.Text = tbPackageVersion.Text = string.Empty;
+            butAnalyze.Enabled = butOpenFile.Enabled = linkCopyContentID.Enabled = linkRename.Enabled = linkProductID.Visible = false;
             Dictionary<string, string> headers = new() { { "Range", "0-4095" } };
-            using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(url, "GET", null, null, headers);
+            using HttpResponseMessage? response = await Task.Run(() => ClassWeb.HttpResponseMessage(url, "GET", null, null, headers));
             if (response != null && response.IsSuccessStatusCode)
             {
                 byte[] buffer = response.Content.ReadAsByteArrayAsync().Result;
@@ -2459,6 +2444,7 @@ namespace XboxDownload
                 string msg = response != null ? "Download failed, message£º" + response.ReasonPhrase : "Download failed.";
                 MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            butAnalyze.Enabled = butOpenFile.Enabled = true;
         }
 
         private void ButOpenFile_Click(object sender, EventArgs e)
@@ -2473,7 +2459,8 @@ namespace XboxDownload
             string sFilePath = ofd.FileName;
             tbDownloadUrl.Text = "";
             tbFilePath.Text = sFilePath;
-
+            tbContentId.Text = tbProductID.Text = tbBuildID.Text = tbFileTimeCreated.Text = tbDriveSize.Text = tbPackageVersion.Text = string.Empty;
+            butAnalyze.Enabled = butOpenFile.Enabled = linkCopyContentID.Enabled = linkRename.Enabled = linkProductID.Visible = false;
             FileStream? fs = null;
             try
             {
@@ -2491,7 +2478,9 @@ namespace XboxDownload
                 fs.Close();
                 XvcParse(bFileBuffer);
             }
+            butAnalyze.Enabled = butOpenFile.Enabled = true;
         }
+
         private void XvcParse(byte[] bFileBuffer)
         {
             tbContentId.Text = tbProductID.Text = tbBuildID.Text = tbFileTimeCreated.Text = tbDriveSize.Text = tbPackageVersion.Text = string.Empty;
