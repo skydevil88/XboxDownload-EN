@@ -462,7 +462,6 @@ namespace XboxDownload
                 butStart.Enabled = false;
                 bServiceFlag = false;
                 UpdateHosts(false);
-                if (Properties.Settings.Default.SetDns) ClassDNS.SetDns(null);
                 if (string.IsNullOrEmpty(Properties.Settings.Default.DnsIP)) tbDnsIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.GameIP)) tbGameIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.AppIP)) tbAppIP.Clear();
@@ -483,7 +482,6 @@ namespace XboxDownload
                 httpListen.Close();
                 httpsListen.Close();
                 Program.SystemSleep.RestoreForCurrentThread();
-                if (Properties.Settings.Default.MicrosoftStore) RestartService("DoSvc");
             }
             else
             {
@@ -763,7 +761,6 @@ namespace XboxDownload
                     }
                 });
                 UpdateHosts(true);
-                if (Properties.Settings.Default.MicrosoftStore) RestartService("DoSvc");
                 if (Properties.Settings.Default.DnsService)
                 {
                     linkTestDns.Enabled = true;
@@ -979,35 +976,6 @@ namespace XboxDownload
             {
                 if (add) MessageBox.Show("Failed to modify the system Hosts file, message£º" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private static void RestartService(string servicename)
-        {
-            Task.Run(() =>
-            {
-                ServiceController? service = ServiceController.GetServices().Where(s => s.ServiceName == servicename).SingleOrDefault();
-                if (service != null)
-                {
-                    TimeSpan timeout = TimeSpan.FromMilliseconds(30000);
-                    try
-                    {
-                        if (service.Status == ServiceControllerStatus.Running)
-                        {
-                            service.Stop();
-                            service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
-                        }
-                        if (service.Status != ServiceControllerStatus.Running)
-                        {
-                            service.Start();
-                            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                    }
-                }
-            });
         }
 
         private void LvLog_MouseClick(object sender, MouseEventArgs e)
@@ -1498,7 +1466,6 @@ namespace XboxDownload
                         sb.AppendLine(ip + " origin-a.akamaihd.net # XboxDownload");
                         sb.AppendLine("0.0.0.0 ssl-lvlt.cdn.ea.com # XboxDownload");
                         sb.AppendLine(ip + " blzddist1-a.akamaihd.net # XboxDownload");
-                        ThreadPool.QueueUserWorkItem(delegate { RestartService("DoSvc"); });
                         break;
                     case "Playstation":
                         sHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+[^\s]+\.dl\.playstation\.net\s+# XboxDownload\r\n", "");
