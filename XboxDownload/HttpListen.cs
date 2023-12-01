@@ -405,12 +405,9 @@ namespace XboxDownload
 
         public void Close()
         {
-            if (socket != null)
-            {
-                socket.Close();
-                socket.Dispose();
-                socket = null;
-            }
+            socket?.Close();
+            socket?.Dispose();
+            socket = null;
         }
 
         readonly ConcurrentDictionary<String, String> dicFilePath = new();

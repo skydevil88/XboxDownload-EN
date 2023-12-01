@@ -512,12 +512,9 @@ namespace XboxDownload
 
         public void Close()
         {
-            if (socket != null)
-            {
-                socket.Close();
-                socket.Dispose();
-                socket = null;
-            }
+            socket?.Close();
+            socket?.Dispose();
+            socket = null;
         }
     }
 

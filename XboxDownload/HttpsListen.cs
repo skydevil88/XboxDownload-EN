@@ -325,24 +325,21 @@ namespace XboxDownload
 
         public void Close()
         {
-            if (socket != null)
-            {
-                socket.Close();
-                socket.Dispose();
-                socket = null;
+            socket?.Close();
+            socket?.Dispose();
+            socket = null;
 
-                X509Store store = new(StoreName.Root, StoreLocation.LocalMachine);
-                store.Open(OpenFlags.ReadWrite);
-                foreach (var item in store.Certificates)
+            X509Store store = new(StoreName.Root, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadWrite);
+            foreach (var item in store.Certificates)
+            {
+                if (item.SubjectName.Name == "CN=XboxDownload")
                 {
-                    if (item.SubjectName.Name == "CN=XboxDownload")
-                    {
-                        store.Remove(item);
-                        break;
-                    }
+                    store.Remove(item);
+                    break;
                 }
-                store.Close();
             }
+            store.Close();
         }
     }
 }
