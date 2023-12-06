@@ -772,7 +772,7 @@ namespace XboxDownload
 
     internal class ClassDNS
     {
-        public static void SetDns(string dns)
+        public static void SetDns(string? dns)
         {
             using var key = Microsoft.Win32.Registry.LocalMachine;
             foreach (var item in DnsListen.dicDns)

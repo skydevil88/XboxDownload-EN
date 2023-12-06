@@ -462,6 +462,7 @@ namespace XboxDownload
                 butStart.Enabled = false;
                 bServiceFlag = false;
                 UpdateHosts(false);
+                if (Properties.Settings.Default.SetDns) ClassDNS.SetDns(null);
                 if (string.IsNullOrEmpty(Properties.Settings.Default.DnsIP)) tbDnsIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.GameIP)) tbGameIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.AppIP)) tbAppIP.Clear();
