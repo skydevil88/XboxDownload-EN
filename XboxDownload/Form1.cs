@@ -1080,13 +1080,11 @@ namespace XboxDownload
                     tssUseIP1.Visible = true;
                     tsmUseIPCom.Visible = true;
                     tsmUseIPApp.Visible = true;
+                    tsmUseIPPS.Visible = true;
                     tsmUseIPNS.Visible = true;
                     tsmUseIPEa.Visible = true;
                     tsmUseAkamai.Visible = true;
                     tsmUseIPBattle.Visible = true;
-                    break;
-                case "Playstation":
-                    tsmUseIPPS.Visible = true;
                     break;
             }
             tsmSpeedTest.Visible = true;
@@ -1199,9 +1197,6 @@ namespace XboxDownload
                 case 1:
                     host = "Akamai";
                     break;
-                case 2:
-                    host = "Playstation";
-                    break;
             }
             dgvIpList.Tag = host;
             gbIPList.Text = "IP list (" + host + ")";
@@ -1262,70 +1257,34 @@ namespace XboxDownload
                             Parent = this.flpTestUrl
                         };
                         lb1.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
-                        LinkLabel lb12 = new()
-                        {
-                            Tag = "http://ctest-dl-lp1.cdn.nintendo.net/30m",
-                            Text = "Switch file",
-                            AutoSize = true,
-                            Parent = this.flpTestUrl
-                        };
-                        lb12.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
-                        LinkLabel lb3 = new()
-                        {
-                            Tag = "http://origin-a.akamaihd.net/Origin-Client-Download/origin/live/OriginThinSetup.exe",
-                            Text = "Origin (EA)",
-                            AutoSize = true,
-                            Parent = this.flpTestUrl
-                        };
-                        lb3.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
-                        LinkLabel lb4 = new()
-                        {
-                            Tag = "http://blzddist1-a.akamaihd.net/tpr/odin/data/e9/07/e9079f76b9939f279dd2cb04f3b28143",
-                            Text = "Call of Duty: Warzone (Battle)",
-                            AutoSize = true,
-                            Parent = this.flpTestUrl
-                        };
-                        lb4.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
-                    }
-                    break;
-                case "Playstation":
-                    {
-                        LinkLabel lb1 = new()
+                        LinkLabel lb2 = new()
                         {
                             Tag = "http://gst.prod.dl.playstation.net/networktest/get_192m",
                             Text = "PSN file",
                             AutoSize = true,
                             Parent = this.flpTestUrl
                         };
-                        lb1.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
-                        LinkLabel lb2 = new()
-                        {
-                            Tag = "http://gst.prod.dl.playstation.net/gst/prod/00/PPSA04478_00/app/pkg/26/f_f2e4ff2bc3be11cb844dfe2a7ff8df357d7930152fb5984294a794823ec7472b/EP1464-PPSA04478_00-XXXXXXXXXXXXXXXX_0.pkg",
-                            Text = "Fall Guys (PS5)",
-                            AutoSize = true,
-                            Parent = this.flpTestUrl
-                        };
                         lb2.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
-                        LinkLabel lb3 = new()
+                        LinkLabel lb13 = new()
                         {
-                            Tag = "http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA03962_00/4/f_526a2fab32d369a8ca6298b59686bf823fa9edfe95acb85bc140c27f810842ce/f/UP0102-CUSA03962_00-BH70000000000001_0.pkg",
-                            Text = "Resident Evil 7 (PS4)",
+                            Tag = "http://ctest-dl-lp1.cdn.nintendo.net/30m",
+                            Text = "Switch file",
                             AutoSize = true,
                             Parent = this.flpTestUrl
                         };
-                        lb3.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
+                        lb13.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
                         LinkLabel lb4 = new()
                         {
-                            Tag = "http://zeus.dl.playstation.net/cdn/UP1004/NPUB31154_00/eISFknCNDxqSsVVywSenkJdhzOIfZjrqKHcuGBHEGvUxQJksdPvRNYbIyWcxFsvH.pkg",
-                            Text = "GTA 5 (PS3)",
+                            Tag = "http://origin-a.akamaihd.net/Origin-Client-Download/origin/live/OriginThinSetup.exe",
+                            Text = "Origin (EA)",
                             AutoSize = true,
                             Parent = this.flpTestUrl
                         };
                         lb4.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
                         LinkLabel lb5 = new()
                         {
-                            Tag = "http://ares.dl.playstation.net/cdn/JP0102/PCSG00350_00/fMBmIgPfrBTVSZCRQFevSzxaPyzFWOuorSKrvdIjDIJwmaGLjpTmRgzLLTJfASFYZMqEpwSknlWocYelXNHMkzXvpbbvtCSymAwWF.pkg",
-                            Text = "MHF-G (PSV)",
+                            Tag = "http://blzddist1-a.akamaihd.net/tpr/odin/data/e9/07/e9079f76b9939f279dd2cb04f3b28143",
+                            Text = "Call of Duty: Warzone (Battle)",
                             AutoSize = true,
                             Parent = this.flpTestUrl
                         };
@@ -1441,7 +1400,7 @@ namespace XboxDownload
                 switch (host)
                 {
                     case "Akamai":
-                        sHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+[^\s]+(\.xboxlive\.com|\.xboxlive\.cn|\.delivery\.mp\.microsoft\.com|\.nintendo\.net|\.cdn\.ea\.com|\.akamaihd\.net)\s+# XboxDownload\r\n", "");
+                        sHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+[^\s]+(\.xboxlive\.com|\.xboxlive\.cn|\.delivery\.mp\.microsoft\.com|\.dl\.playstation\.net|\.nintendo\.net|\.cdn\.ea\.com|\.akamaihd\.net)\s+# XboxDownload\r\n", "");
                         sb.AppendLine(ip + " xvcf1.xboxlive.com # XboxDownload");
                         sb.AppendLine(ip + " xvcf2.xboxlive.com # XboxDownload");
                         sb.AppendLine(ip + " assets1.xboxlive.com # XboxDownload");
@@ -1458,6 +1417,10 @@ namespace XboxDownload
                         sb.AppendLine(ip + " dlassets2.xboxlive.cn # XboxDownload");
                         sb.AppendLine(ip + " dl.delivery.mp.microsoft.com # XboxDownload");
                         sb.AppendLine(ip + " tlu.dl.delivery.mp.microsoft.com # XboxDownload");
+                        sb.AppendLine(ip + " gst.prod.dl.playstation.net # XboxDownload");
+                        sb.AppendLine(ip + " gs2.ww.prod.dl.playstation.net # XboxDownload");
+                        sb.AppendLine(ip + " zeus.dl.playstation.net # XboxDownload");
+                        sb.AppendLine(ip + " ares.dl.playstation.net # XboxDownload");
                         sb.AppendLine(ip + " atum.hac.lp1.d4c.nintendo.net # XboxDownload");
                         sb.AppendLine(ip + " bugyo.hac.lp1.eshop.nintendo.net # XboxDownload");
                         sb.AppendLine(ip + " ctest-ul-lp1.cdn.nintendo.net # XboxDownload");
@@ -1466,13 +1429,6 @@ namespace XboxDownload
                         sb.AppendLine(ip + " origin-a.akamaihd.net # XboxDownload");
                         sb.AppendLine("0.0.0.0 ssl-lvlt.cdn.ea.com # XboxDownload");
                         sb.AppendLine(ip + " blzddist1-a.akamaihd.net # XboxDownload");
-                        break;
-                    case "Playstation":
-                        sHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+[^\s]+\.dl\.playstation\.net\s+# XboxDownload\r\n", "");
-                        sb.AppendLine(ip + " gst.prod.dl.playstation.net # XboxDownload");
-                        sb.AppendLine(ip + " gs2.ww.prod.dl.playstation.net # XboxDownload");
-                        sb.AppendLine(ip + " zeus.dl.playstation.net # XboxDownload");
-                        sb.AppendLine(ip + " ares.dl.playstation.net # XboxDownload");
                         break;
                     default:
                         sHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+" + host + @"\s+# XboxDownload\r\n", "");
@@ -1525,6 +1481,12 @@ namespace XboxDownload
                         sb.AppendLine("address=/dl.delivery.mp.microsoft.com/" + ip);
                         sb.AppendLine("address=/tlu.dl.delivery.mp.microsoft.com/" + ip);
                         sb.AppendLine();
+                        sb.AppendLine("# PS");
+                        sb.AppendLine("address=/gst.prod.dl.playstation.net/" + ip);
+                        sb.AppendLine("address=/gs2.ww.prod.dl.playstation.net/" + ip);
+                        sb.AppendLine("address=/zeus.dl.playstation.net/" + ip);
+                        sb.AppendLine("address=/ares.dl.playstation.net/" + ip);
+                        sb.AppendLine();
                         sb.AppendLine("# NS");
                         sb.AppendLine("address=/atum.hac.lp1.d4c.nintendo.net/" + ip);
                         sb.AppendLine("address=/bugyo.hac.lp1.eshop.nintendo.net/" + ip);
@@ -1559,6 +1521,12 @@ namespace XboxDownload
                         sb.AppendLine(ip + " dl.delivery.mp.microsoft.com");
                         sb.AppendLine(ip + " tlu.dl.delivery.mp.microsoft.com");
                         sb.AppendLine();
+                        sb.AppendLine("# PS");
+                        sb.AppendLine(ip + " gst.prod.dl.playstation.net");
+                        sb.AppendLine(ip + " gs2.ww.prod.dl.playstation.net");
+                        sb.AppendLine(ip + " zeus.dl.playstation.net");
+                        sb.AppendLine(ip + " ares.dl.playstation.net");
+                        sb.AppendLine();
                         sb.AppendLine("# NS");
                         sb.AppendLine(ip + " atum.hac.lp1.d4c.nintendo.net");
                         sb.AppendLine(ip + " bugyo.hac.lp1.eshop.nintendo.net");
@@ -1572,26 +1540,6 @@ namespace XboxDownload
                         sb.AppendLine();
                         sb.AppendLine("# Battle");
                         sb.AppendLine(ip + " blzddist1-a.akamaihd.net");
-                    }
-                    break;
-                case "Playstation":
-                    if (tsmi.Name == "tsmDNSmasp")
-                    {
-                        sb.AppendLine("# PS");
-                        sb.AppendLine("address=/gst.prod.dl.playstation.net/" + ip);
-                        sb.AppendLine("address=/gs2.ww.prod.dl.playstation.net/" + ip);
-                        sb.AppendLine("address=/zeus.dl.playstation.net/" + ip);
-                        sb.AppendLine("address=/ares.dl.playstation.net/" + ip);
-                        sb.AppendLine();
-                    }
-                    else
-                    {
-                        sb.AppendLine("# PS");
-                        sb.AppendLine(ip + " gst.prod.dl.playstation.net");
-                        sb.AppendLine(ip + " gs2.ww.prod.dl.playstation.net");
-                        sb.AppendLine(ip + " zeus.dl.playstation.net");
-                        sb.AppendLine(ip + " ares.dl.playstation.net");
-                        sb.AppendLine();
                     }
                     break;
                 default:
@@ -1787,132 +1735,75 @@ namespace XboxDownload
                 int range = 104857599;
                 string userAgent = uri.Host.EndsWith(".nintendo.net") ? "XboxDownload/1.0 (Nintendo NX)" : "XboxDownload/1.0";
                 Stopwatch sw = new();
-                if (uri.Host.EndsWith(".dl.playstation.net"))
+
+                StringBuilder sb = new();
+                sb.AppendLine("GET " + uri.PathAndQuery + " HTTP/1.1");
+                sb.AppendLine("Host: " + uri.Host);
+                sb.AppendLine("User-Agent: " + userAgent);
+                sb.AppendLine("Range: bytes=0-" + range);
+                sb.AppendLine();
+                byte[] buffer = Encoding.ASCII.GetBytes(sb.ToString());
+
+                foreach (DataGridViewRow dgvr in ls)
                 {
-                    foreach (DataGridViewRow dgvr in ls)
+                    if (ctsSpeedTest.IsCancellationRequested) break;
+                    string? ip = dgvr.Cells["Col_IP"].Value.ToString();
+                    if (string.IsNullOrEmpty(ip)) continue;
+                    dgvr.Cells["Col_302"].Value = false;
+                    dgvr.Cells["Col_TTL"].Value = null;
+                    dgvr.Cells["Col_RoundtripTime"].Value = null;
+                    dgvr.Cells["Col_Speed"].Value = "Testing";
+                    dgvr.Cells["Col_RoundtripTime"].Style.ForeColor = Color.Empty;
+                    dgvr.Cells["Col_Speed"].Style.ForeColor = Color.Empty;
+                    dgvr.Tag = null;
+
+                    using (Ping p1 = new())
                     {
-                        if (ctsSpeedTest.IsCancellationRequested) break;
-                        string? ip = dgvr.Cells["Col_IP"].Value.ToString();
-                        if (string.IsNullOrEmpty(ip)) continue;
-                        dgvr.Cells["Col_302"].Value = false;
-                        dgvr.Cells["Col_TTL"].Value = null;
-                        dgvr.Cells["Col_RoundtripTime"].Value = null;
-                        dgvr.Cells["Col_Speed"].Value = "Testing";
-                        dgvr.Cells["Col_RoundtripTime"].Style.ForeColor = Color.Empty;
-                        dgvr.Cells["Col_Speed"].Style.ForeColor = Color.Empty;
-                        dgvr.Tag = null;
-
-                        using (Ping p1 = new())
+                        try
                         {
-                            try
+                            PingReply reply = p1.Send(ip);
+                            if (reply.Status == IPStatus.Success)
                             {
-                                PingReply reply = p1.Send(ip);
-                                if (reply.Status == IPStatus.Success)
-                                {
-                                    dgvr.Cells["Col_TTL"].Value = reply.Options?.Ttl;
-                                    dgvr.Cells["Col_RoundtripTime"].Value = reply.RoundtripTime;
-                                }
+                                dgvr.Cells["Col_TTL"].Value = reply.Options?.Ttl;
+                                dgvr.Cells["Col_RoundtripTime"].Value = reply.RoundtripTime;
                             }
-                            catch { }
                         }
-
-                        Uri uri2 = new(uri.Scheme + "://" + ip + ":" + uri.Port + "/" + uri.Host + uri.PathAndQuery);
-                        StringBuilder sb = new();
-                        sb.AppendLine("GET " + uri2.PathAndQuery + " HTTP/1.1");
-                        sb.AppendLine("Host: " + uri2.Host);
-                        sb.AppendLine("User-Agent: " + userAgent);
-                        sb.AppendLine("Range: bytes=0-" + range);
-                        sb.AppendLine();
-                        byte[] buffer = Encoding.ASCII.GetBytes(sb.ToString());
-
-                        sw.Restart();
-                        SocketPackage socketPackage = uri.Scheme == "https" ? ClassWeb.TlsRequest(uri2, buffer, null, false, null, timeout, ctsSpeedTest) : ClassWeb.TcpRequest(uri2, buffer, null, false, null, timeout, ctsSpeedTest);
-                        sw.Stop();
-                        dgvr.Tag = string.IsNullOrEmpty(socketPackage.Err) ? socketPackage.Headers : socketPackage.Err;
-                        if (socketPackage.Headers.StartsWith("HTTP/1.1 206"))
+                        catch { }
+                    }
+                    sw.Restart();
+                    SocketPackage socketPackage = uri.Scheme == "https" ? ClassWeb.TlsRequest(uri, buffer, ip, false, null, timeout, ctsSpeedTest) : ClassWeb.TcpRequest(uri, buffer, ip, false, null, timeout, ctsSpeedTest);
+                    sw.Stop();
+                    if (socketPackage.Headers.StartsWith("HTTP/1.1 302"))
+                    {
+                        dgvr.Cells["Col_302"].Value = true;
+                        Match result = Regex.Match(socketPackage.Headers, @"Location: (.+)");
+                        if (result.Success)
                         {
-                            double speed = Math.Round((double)(socketPackage.Buffer.Length) / sw.ElapsedMilliseconds * 1000 / 1024 / 1024, 2, MidpointRounding.AwayFromZero);
-                            dgvr.Cells["Col_Speed"].Value = speed;
-                            dgvr.Tag += "Download Size£º" + ClassMbr.ConvertBytes((ulong)socketPackage.Buffer.Length) + "£¬Timing£º" + sw.ElapsedMilliseconds.ToString("N0") + " milliseconds£¬average speed£º" + speed + " MB/s";
-                        }
-                        else
-                        {
-                            dgvr.Cells["Col_Speed"].Value = (double)0;
-                            dgvr.Cells["Col_Speed"].Style.ForeColor = Color.Red;
+                            Uri uri2 = new(uri, result.Groups[1].Value);
+                            dgvr.Tag = socketPackage.Headers + "===============HTTP 302 Moved Temporarily===============\n" + uri2.OriginalString + "\n\n";
+                            sb.Clear();
+                            sb.AppendLine("GET " + uri2.PathAndQuery + " HTTP/1.1");
+                            sb.AppendLine("Host: " + uri2.Host);
+                            sb.AppendLine("User-Agent: " + userAgent);
+                            sb.AppendLine("Range: bytes=0-" + range);
+                            sb.AppendLine();
+                            byte[] buffer2 = Encoding.ASCII.GetBytes(sb.ToString());
+                            sw.Restart();
+                            socketPackage = uri2.Scheme == "https" ? ClassWeb.TlsRequest(uri2, buffer2, null, false, null, timeout, ctsSpeedTest) : ClassWeb.TcpRequest(uri2, buffer2, null, false, null, timeout, ctsSpeedTest);
+                            sw.Stop();
                         }
                     }
-                }
-                else
-                {
-                    StringBuilder sb = new();
-                    sb.AppendLine("GET " + uri.PathAndQuery + " HTTP/1.1");
-                    sb.AppendLine("Host: " + uri.Host);
-                    sb.AppendLine("User-Agent: " + userAgent);
-                    sb.AppendLine("Range: bytes=0-" + range);
-                    sb.AppendLine();
-                    byte[] buffer = Encoding.ASCII.GetBytes(sb.ToString());
-
-                    foreach (DataGridViewRow dgvr in ls)
+                    dgvr.Tag += string.IsNullOrEmpty(socketPackage.Err) ? socketPackage.Headers : socketPackage.Err;
+                    if (socketPackage.Headers.StartsWith("HTTP/1.1 206"))
                     {
-                        if (ctsSpeedTest.IsCancellationRequested) break;
-                        string? ip = dgvr.Cells["Col_IP"].Value.ToString();
-                        if (string.IsNullOrEmpty(ip)) continue;
-                        dgvr.Cells["Col_302"].Value = false;
-                        dgvr.Cells["Col_TTL"].Value = null;
-                        dgvr.Cells["Col_RoundtripTime"].Value = null;
-                        dgvr.Cells["Col_Speed"].Value = "Testing";
-                        dgvr.Cells["Col_RoundtripTime"].Style.ForeColor = Color.Empty;
-                        dgvr.Cells["Col_Speed"].Style.ForeColor = Color.Empty;
-                        dgvr.Tag = null;
-
-                        using (Ping p1 = new())
-                        {
-                            try
-                            {
-                                PingReply reply = p1.Send(ip);
-                                if (reply.Status == IPStatus.Success)
-                                {
-                                    dgvr.Cells["Col_TTL"].Value = reply.Options?.Ttl;
-                                    dgvr.Cells["Col_RoundtripTime"].Value = reply.RoundtripTime;
-                                }
-                            }
-                            catch { }
-                        }
-                        sw.Restart();
-                        SocketPackage socketPackage = uri.Scheme == "https" ? ClassWeb.TlsRequest(uri, buffer, ip, false, null, timeout, ctsSpeedTest) : ClassWeb.TcpRequest(uri, buffer, ip, false, null, timeout, ctsSpeedTest);
-                        sw.Stop();
-                        if (socketPackage.Headers.StartsWith("HTTP/1.1 302"))
-                        {
-                            dgvr.Cells["Col_302"].Value = true;
-                            Match result = Regex.Match(socketPackage.Headers, @"Location: (.+)");
-                            if (result.Success)
-                            {
-                                Uri uri2 = new(uri, result.Groups[1].Value);
-                                dgvr.Tag = socketPackage.Headers + "===============HTTP 302 Moved Temporarily===============\n" + uri2.OriginalString + "\n\n";
-                                sb.Clear();
-                                sb.AppendLine("GET " + uri2.PathAndQuery + " HTTP/1.1");
-                                sb.AppendLine("Host: " + uri2.Host);
-                                sb.AppendLine("User-Agent: " + userAgent);
-                                sb.AppendLine("Range: bytes=0-" + range);
-                                sb.AppendLine();
-                                byte[] buffer2 = Encoding.ASCII.GetBytes(sb.ToString());
-                                sw.Restart();
-                                socketPackage = uri2.Scheme == "https" ? ClassWeb.TlsRequest(uri2, buffer2, null, false, null, timeout, ctsSpeedTest) : ClassWeb.TcpRequest(uri2, buffer2, null, false, null, timeout, ctsSpeedTest);
-                                sw.Stop();
-                            }
-                        }
-                        dgvr.Tag += string.IsNullOrEmpty(socketPackage.Err) ? socketPackage.Headers : socketPackage.Err;
-                        if (socketPackage.Headers.StartsWith("HTTP/1.1 206"))
-                        {
-                            double speed = Math.Round((double)(socketPackage.Buffer.Length) / sw.ElapsedMilliseconds * 1000 / 1024 / 1024, 2, MidpointRounding.AwayFromZero);
-                            dgvr.Cells["Col_Speed"].Value = speed;
-                            dgvr.Tag += "Download Size£º" + ClassMbr.ConvertBytes((ulong)socketPackage.Buffer.Length) + "£¬Timing£º" + sw.ElapsedMilliseconds.ToString("N0") + " milliseconds£¬average speed£º" + speed + " MB/s";
-                        }
-                        else
-                        {
-                            dgvr.Cells["Col_Speed"].Value = (double)0;
-                            dgvr.Cells["Col_Speed"].Style.ForeColor = Color.Red;
-                        }
+                        double speed = Math.Round((double)(socketPackage.Buffer.Length) / sw.ElapsedMilliseconds * 1000 / 1024 / 1024, 2, MidpointRounding.AwayFromZero);
+                        dgvr.Cells["Col_Speed"].Value = speed;
+                        dgvr.Tag += "Download Size£º" + ClassMbr.ConvertBytes((ulong)socketPackage.Buffer.Length) + "£¬Timing£º" + sw.ElapsedMilliseconds.ToString("N0") + " milliseconds£¬average speed£º" + speed + " MB/s";
+                    }
+                    else
+                    {
+                        dgvr.Cells["Col_Speed"].Value = (double)0;
+                        dgvr.Cells["Col_Speed"].Style.ForeColor = Color.Red;
                     }
                 }
             }

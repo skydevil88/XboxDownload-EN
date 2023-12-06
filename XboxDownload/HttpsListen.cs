@@ -329,16 +329,10 @@ namespace XboxDownload
             socket?.Dispose();
             socket = null;
 
-            X509Store store = new(StoreName.Root, StoreLocation.LocalMachine);
+            using X509Store store = new(StoreName.Root, StoreLocation.LocalMachine);
             store.Open(OpenFlags.ReadWrite);
-            foreach (var item in store.Certificates)
-            {
-                if (item.SubjectName.Name == "CN=XboxDownload")
-                {
-                    store.Remove(item);
-                    break;
-                }
-            }
+            X509Certificate2Collection certificates = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, "CN=XboxDownload", false);
+            if (certificates.Count >= 1) store.RemoveRange(certificates);
             store.Close();
         }
     }
