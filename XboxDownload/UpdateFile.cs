@@ -30,7 +30,7 @@ namespace XboxDownload
                 };
                 tasks[i] = new Task(() =>
                 {
-                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(proxy + UpdateFile.project + "/releases/latest", "HEAD", null, null, null, 6000);
+                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(proxy + UpdateFile.project + "/releases/latest", "HEAD", null, null, null, 6000, "XboxDownload");
                     if (response != null && response.IsSuccessStatusCode && string.IsNullOrEmpty(releases))
                         releases = response.RequestMessage?.RequestUri?.ToString();
                     else
@@ -66,7 +66,7 @@ namespace XboxDownload
                         return;
                     }
                     string download = releases.Replace("tag", "download") + "/XboxDownload.zip";
-                    using (HttpResponseMessage? response = ClassWeb.HttpResponseMessage(download, "GET", null, null, null, 60000))
+                    using (HttpResponseMessage? response = ClassWeb.HttpResponseMessage(download, "GET", null, null, null, 60000, "XboxDownload"))
                     {
                         if (response != null && response.IsSuccessStatusCode)
                         {
@@ -140,7 +140,7 @@ namespace XboxDownload
                 tasks[i] = new Task(() =>
                 {
                     string tmpUrl = proxy + UpdateFile.project.Replace("github.com", "raw.githubusercontent.com") + "/master/IP/" + fi.Name;
-                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(tmpUrl, "HEAD", null, null, null, 6000);
+                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(tmpUrl, "HEAD", null, null, null, 6000, "XboxDownload");
                     if (response != null && response.IsSuccessStatusCode && string.IsNullOrEmpty(fileUrl))
                         fileUrl = tmpUrl;
                     else
@@ -151,7 +151,7 @@ namespace XboxDownload
             await Task.WhenAny(tasks);
             if (!string.IsNullOrEmpty(fileUrl))
             {
-                using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(fileUrl, "GET", null, null, null, 60000);
+                using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(fileUrl, "GET", null, null, null, 60000, "XboxDownload");
                 if (response != null && response.IsSuccessStatusCode)
                 {
                     byte[] buffer = response.Content.ReadAsByteArrayAsync().Result;

@@ -71,7 +71,7 @@ namespace XboxDownload
                 CallbackMsg d = new(SetMsg);
                 Invoke(d, new object[] { str });
             }
-            else textBox1.AppendText(str);
+            else textBox1.AppendText(str.Trim()+"\r\n");
         }
     }
 }

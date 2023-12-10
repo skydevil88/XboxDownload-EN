@@ -22,6 +22,7 @@ namespace XboxDownload
         internal readonly static String resourcePath = Application.StartupPath + "Resource";
         internal static List<Market> lsMarket = new();
         internal static float dpixRatio = 1;
+        internal static JsonSerializerOptions jsOptions = new() { PropertyNameCaseInsensitive = true };
         private readonly DataTable dtHosts = new("Hosts");
         private readonly DnsListen dnsListen;
         private readonly HttpListen httpListen;
@@ -103,8 +104,6 @@ namespace XboxDownload
 
             tbIpLocation.Text = Properties.Settings.Default.IpLocation;
 
-            //IPAddress[] ipAddresses = Array.FindAll(Dns.GetHostEntry(string.Empty).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
-            //cbLocalIP.Items.AddRange(ipAddresses);
             NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up && x.NetworkInterfaceType != NetworkInterfaceType.Loopback && (x.NetworkInterfaceType == NetworkInterfaceType.Ethernet || x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && !x.Description.Contains("Virtual")).ToArray();
             foreach (NetworkInterface adapter in adapters)
             {
@@ -210,9 +209,9 @@ namespace XboxDownload
                 new("United States", "US", "en-US")
             }).ToArray());
             cbGameMarket.Items.AddRange(Form1.lsMarket.ToArray());
-            int keyIndex = Form1.lsMarket.FindIndex(x => x.code == RegionInfo.CurrentRegion.Name);
-            if (keyIndex == -1) keyIndex = Form1.lsMarket.Count - 1;
-            cbGameMarket.SelectedIndex = keyIndex;
+            int region = Form1.lsMarket.FindIndex(x => x.code == RegionInfo.CurrentRegion.Name);
+            if (region == -1) region = Form1.lsMarket.Count - 1;
+            cbGameMarket.SelectedIndex = region;
             pbGame.Image = pbGame.InitialImage;
 
             if (Environment.OSVersion.Version.Major < 10)
@@ -264,7 +263,7 @@ namespace XboxDownload
 
         private void TsmProductManual_Click(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo("https://github.com/skydevil88/XboxDownload-EN") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(UpdateFile.project) { UseShellExecute = true });
         }
 
         private void TsmOpenSite_Click(object sender, EventArgs e)
@@ -431,11 +430,23 @@ namespace XboxDownload
             }
         }
 
+        private void CkbHttpService_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!ckbHttpService.Checked)
+            {
+                ckbGameLink.Checked = false;
+            }
+        }
+
         private void CkbGameLink_CheckedChanged(object? sender, EventArgs? e)
         {
             if (!ckbGameLink.Checked)
             {
                 ckbLocalUpload.Checked = false;
+            }
+            else
+            {
+                ckbHttpService.Checked = true;
             }
         }
 
@@ -758,7 +769,7 @@ namespace XboxDownload
                     using HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://ipv6.lookup.test-ipv6.com/", "PUT");
                     if (response != null && response.IsSuccessStatusCode)
                     {
-                        SaveLog("Notes", "Detected it's using with IPv6, if connect Xbox console, disable IPv6 through the router.", "localhost", 0x0000FF);
+                        SaveLog("Notes", "Detected it's using with IPv6, if connect Xbox|PS console, disable IPv6 through the router.", "localhost", 0x0000FF);
                     }
                 });
                 UpdateHosts(true);
@@ -1482,7 +1493,7 @@ namespace XboxDownload
                         sb.AppendLine("address=/dl.delivery.mp.microsoft.com/" + ip);
                         sb.AppendLine("address=/tlu.dl.delivery.mp.microsoft.com/" + ip);
                         sb.AppendLine();
-                        sb.AppendLine("# PS");
+                        sb.AppendLine("# PlayStation");
                         sb.AppendLine("address=/gst.prod.dl.playstation.net/" + ip);
                         sb.AppendLine("address=/gs2.ww.prod.dl.playstation.net/" + ip);
                         sb.AppendLine("address=/zeus.dl.playstation.net/" + ip);
@@ -1522,7 +1533,7 @@ namespace XboxDownload
                         sb.AppendLine(ip + " dl.delivery.mp.microsoft.com");
                         sb.AppendLine(ip + " tlu.dl.delivery.mp.microsoft.com");
                         sb.AppendLine();
-                        sb.AppendLine("# PS");
+                        sb.AppendLine("# PlayStation");
                         sb.AppendLine(ip + " gst.prod.dl.playstation.net");
                         sb.AppendLine(ip + " gs2.ww.prod.dl.playstation.net");
                         sb.AppendLine(ip + " zeus.dl.playstation.net");
@@ -1734,7 +1745,7 @@ namespace XboxDownload
             if (uri != null)
             {
                 int range = 104857599;
-                string userAgent = uri.Host.EndsWith(".nintendo.net") ? "XboxDownload/1.0 (Nintendo NX)" : "XboxDownload/1.0";
+                string userAgent = uri.Host.EndsWith(".nintendo.net") ? "XboxDownload (Nintendo NX)" : "XboxDownload";
                 Stopwatch sw = new();
 
                 StringBuilder sb = new();
@@ -2599,7 +2610,7 @@ namespace XboxDownload
             Thread.Sleep(300);
             if (this.query != query) return;
             string url = "https://www.microsoft.com/msstoreapiprod/api/autosuggest?market=en-US&clientId=7F27B536-CF6B-4C65-8638-A0F8CBDFCA65&sources=Microsoft-Terms,Iris-Products,DCatAll-Products&filter=+ClientType:StoreWeb&counts=5,1,5&query=" + ClassWeb.UrlEncode(query);
-            string html = ClassWeb.HttpResponseContent(url, "GET", null, null, null, 30000, "Nothing");
+            string html = ClassWeb.HttpResponseContent(url);
             if (this.query != query) return;
             List<ListViewItem> ls = new();
             if (Regex.IsMatch(html, @"^{.+}$", RegexOptions.Singleline))
@@ -2607,7 +2618,7 @@ namespace XboxDownload
                 ClassGame.Search? json = null;
                 try
                 {
-                    json = JsonSerializer.Deserialize<ClassGame.Search>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    json = JsonSerializer.Deserialize<ClassGame.Search>(html, Form1.jsOptions);
                 }
                 catch { }
                 if (json != null && json.ResultSets != null && json.ResultSets.Count >= 1)
@@ -2737,7 +2748,7 @@ namespace XboxDownload
                     ClassGame.Game? json = null;
                     try
                     {
-                        json = JsonSerializer.Deserialize<ClassGame.Game>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        json = JsonSerializer.Deserialize<ClassGame.Game>(html, Form1.jsOptions);
                     }
                     catch { }
                     if (json != null && json.Products != null && json.Products.Count >= 1)
@@ -2804,7 +2815,7 @@ namespace XboxDownload
                 ClassGame.Game? json = null;
                 try
                 {
-                    json = JsonSerializer.Deserialize<ClassGame.Game>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    json = JsonSerializer.Deserialize<ClassGame.Game>(html, Form1.jsOptions);
                 }
                 catch { }
                 if (json != null && json.Products != null && json.Products.Count >= 1)
@@ -3105,7 +3116,7 @@ namespace XboxDownload
                     ClassGame.Game? json2 = null;
                     try
                     {
-                        json2 = JsonSerializer.Deserialize<ClassGame.Game>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        json2 = JsonSerializer.Deserialize<ClassGame.Game>(html, Form1.jsOptions);
                     }
                     catch { }
                     if (json2 != null && json2.Products != null && json2.Products.Count >= 1)
@@ -3182,7 +3193,7 @@ namespace XboxDownload
                 {
                     try
                     {
-                        json = JsonSerializer.Deserialize<XboxPackage.Game>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        json = JsonSerializer.Deserialize<XboxPackage.Game>(html, Form1.jsOptions);
                     }
                     catch { }
                 }
@@ -3217,16 +3228,14 @@ namespace XboxDownload
                         XboxGameDownload.dicXboxGame.TryAdd(key, XboxGame);
                         update = true;
                     }
-                    if (update)
-                    {
-                        XboxGameDownload.SaveXboxGame();
-                    }
+                    if (update) XboxGameDownload.SaveXboxGame();
                     this.Invoke(new Action(() =>
                     {
                         if (XboxGame.FileSize == packages.MaxDownloadSizeInBytes)
                         {
                             succeed = true;
                             item.ForeColor = Color.Empty;
+                            item.SubItems[2].Text = ClassMbr.ConvertBytes(XboxGame.FileSize);
                             item.SubItems[3].Text = Path.GetFileName(XboxGame.Url);
                         }
                         else
@@ -3249,53 +3258,55 @@ namespace XboxDownload
                     ulong filesize = 0;
                     string? ip = ClassDNS.DoH(hosts);
                     if (!string.IsNullOrEmpty(ip)) return;
-                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://" + ip + "/GetBasePackage/" + contentId, "GET", null, null, new() { { "Host", hosts }, { "Authorization", Properties.Settings.Default.Authorization } });
-                    if (response != null)
+                    using (HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://" + ip + "/GetBasePackage/" + contentId, "GET", null, null, new() { { "Host", hosts }, { "Authorization", Properties.Settings.Default.Authorization } }))
                     {
-                        if (response.IsSuccessStatusCode)
+                        if (response != null)
                         {
-                            string html = response.Content.ReadAsStringAsync().Result;
-                            if (Regex.IsMatch(html, @"^{.+}$"))
+                            if (response.IsSuccessStatusCode)
                             {
-                                XboxGameDownload.PackageFiles? packageFiles = null;
-                                try
+                                string html = response.Content.ReadAsStringAsync().Result;
+                                if (Regex.IsMatch(html, @"^{.+}$"))
                                 {
-                                    var json2 = JsonSerializer.Deserialize<XboxGameDownload.Game>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                                    if (json2 != null && json2.PackageFound)
+                                    XboxGameDownload.PackageFiles? packageFiles = null;
+                                    try
                                     {
-                                        contentId = json2.ContentId;
-                                        packageFiles = json2.PackageFiles.Where(x => x.RelativeUrl.ToLower().EndsWith(".msixvc")).FirstOrDefault();
+                                        var json2 = JsonSerializer.Deserialize<XboxGameDownload.Game>(html, Form1.jsOptions);
+                                        if (json2 != null && json2.PackageFound)
+                                        {
+                                            contentId = json2.ContentId;
+                                            packageFiles = json2.PackageFiles.Where(x => x.RelativeUrl.ToLower().EndsWith(".msixvc")).FirstOrDefault();
+                                        }
+                                    }
+                                    catch { }
+                                    if (packageFiles != null)
+                                    {
+                                        url = packageFiles.CdnRootPaths[0] + packageFiles.RelativeUrl;
+                                        Version version;
+                                        Match result = Regex.Match(url, @"(?<version>\d+\.\d+\.\d+\.\d+)\.\w{8}-\w{4}-\w{4}-\w{4}-\w{12}");
+                                        if (result.Success)
+                                            version = new Version(result.Groups["version"].Value);
+                                        else
+                                            version = new Version();
+                                        XboxGameDownload.Products XboxGame = new()
+                                        {
+                                            Version = version,
+                                            FileSize = packageFiles.FileSize,
+                                            Url = url
+                                        };
+                                        filesize = packageFiles.FileSize;
+                                        XboxGameDownload.dicXboxGame.AddOrUpdate(contentId.ToLower(), XboxGame, (oldkey, oldvalue) => XboxGame);
+                                        packages.MaxDownloadSizeInBytes = filesize;
+                                        packages.PackageDownloadUris[0].Uri = url;
+                                        XboxGameDownload.SaveXboxGame();
                                     }
                                 }
-                                catch { }
-                                if (packageFiles != null)
-                                {
-                                    url = packageFiles.CdnRootPaths[0] + packageFiles.RelativeUrl;
-                                    Version version;
-                                    Match result = Regex.Match(url, @"(?<version>\d+\.\d+\.\d+\.\d+)\.\w{8}-\w{4}-\w{4}-\w{4}-\w{12}");
-                                    if (result.Success)
-                                        version = new Version(result.Groups["version"].Value);
-                                    else
-                                        version = new Version();
-                                    XboxGameDownload.Products XboxGame = new()
-                                    {
-                                        Version = version,
-                                        FileSize = packageFiles.FileSize,
-                                        Url = url
-                                    };
-                                    filesize = packageFiles.FileSize;
-                                    XboxGameDownload.dicXboxGame.AddOrUpdate(contentId.ToLower(), XboxGame, (oldkey, oldvalue) => XboxGame);
-                                    packages.MaxDownloadSizeInBytes = filesize;
-                                    packages.PackageDownloadUris[0].Uri = url;
-                                    XboxGameDownload.SaveXboxGame();
-                                }
                             }
-                        }
-                        else if ((int)response.StatusCode == 401)
-                        {
-                            Properties.Settings.Default.Authorization = null;
-                            Properties.Settings.Default.Save();
-                            url = "Authorization expired. 1.Back to Service tab Click \"Enable HTTP(S) service\" and \"Speed up MS Store (PC)\"  then press \"Start\" butten. 2.Open Xbox app, select a game and click install, await the log show out download link then complete update authorization.";
+                            else if ((int)response.StatusCode == 401)
+                            {
+                                Properties.Settings.Default.Authorization = null;
+                                Properties.Settings.Default.Save();
+                                url = "Authorization expired. 1.Back to Service tab Click \"Enable HTTP(S) service\" and \"Speed up MS Store (PC)\"  then press \"Start\" butten. 2.Open Xbox app, select a game and click install, await the log show out download link then complete update authorization.";
+                            }
                         }
                     }
                     this.Invoke(new Action(() =>
@@ -3330,7 +3341,7 @@ namespace XboxDownload
             {
                 try
                 {
-                    json = JsonSerializer.Deserialize<XboxPackage.App>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    json = JsonSerializer.Deserialize<XboxPackage.App>(html, Form1.jsOptions);
                 }
                 catch { }
             }
@@ -3499,7 +3510,7 @@ namespace XboxDownload
                 {
                     try
                     {
-                        json = JsonSerializer.Deserialize<XboxPackage.App>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        json = JsonSerializer.Deserialize<XboxPackage.App>(html, Form1.jsOptions);
                     }
                     catch { }
                 }
@@ -3950,7 +3961,7 @@ namespace XboxDownload
                 XboxPackage.App? json = null;
                 try
                 {
-                    json = JsonSerializer.Deserialize<XboxPackage.App>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    json = JsonSerializer.Deserialize<XboxPackage.App>(html, Form1.jsOptions);
                 }
                 catch { }
                 if (json != null && json.Code != null && json.Code == "200")

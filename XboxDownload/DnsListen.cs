@@ -17,7 +17,7 @@ namespace XboxDownload
         private readonly Form1 parentForm;
         private readonly Regex reDoHBlacklist = new("google|youtube|facebook|twitter");
         public static Regex reHosts = new(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$");
-        public static ConcurrentDictionary<String, List<ResouceRecord>> dicHosts1 = new(), dicCdn1 = new();
+        public static ConcurrentDictionary<String, List<ResouceRecord>> dicService = new(), dicHosts1 = new(), dicCdn1 = new();
         public static ConcurrentDictionary<Regex, List<ResouceRecord>> dicHosts2 = new(), dicCdn2 = new();
         public static ConcurrentDictionary<String, Dns> dicDns = new();
 
@@ -109,14 +109,15 @@ namespace XboxDownload
             }
 
             Byte[] localIP = IPAddress.Parse(Properties.Settings.Default.LocalIP).GetAddressBytes();
-            Byte[]? gameIP = null;
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.GameIP))
+            Byte[]? gameIP = null, appIP = null, psIP = null, nsIP = null, eaIP = null, battleIP = null;
+            Task[] tasks = new Task[6];
+            tasks[0] = new Task(() =>
             {
-                gameIP = IPAddress.Parse(Properties.Settings.Default.GameIP).GetAddressBytes();
-            }
-            else
-            {
-                Task.Run(() =>
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.GameIP))
+                {
+                    gameIP = IPAddress.Parse(Properties.Settings.Default.GameIP).GetAddressBytes();
+                }
+                else
                 {
                     string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("xvcf1.xboxlive.com") : ClassDNS.HostToIP("xvcf2.xboxlive.com", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
@@ -124,16 +125,15 @@ namespace XboxDownload
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbGameIP, ip);
                         gameIP = IPAddress.Parse(ip).GetAddressBytes();
                     }
-                });
-            }
-            Byte[]? appIP = null;
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.AppIP))
+                }
+            });
+            tasks[1] = new Task(() =>
             {
-                appIP = IPAddress.Parse(Properties.Settings.Default.AppIP).GetAddressBytes();
-            }
-            else
-            {
-                Task.Run(() =>
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.AppIP))
+                {
+                    appIP = IPAddress.Parse(Properties.Settings.Default.AppIP).GetAddressBytes();
+                }
+                else
                 {
                     string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("tlu.dl.delivery.mp.microsoft.com") : ClassDNS.HostToIP("tlu.dl.delivery.mp.microsoft.com", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
@@ -141,16 +141,15 @@ namespace XboxDownload
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbAppIP, ip);
                         appIP = IPAddress.Parse(ip).GetAddressBytes();
                     }
-                });
-            }
-            Byte[]? psIP = null;
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.PSIP))
+                }
+            });
+            tasks[2] = new Task(() =>
             {
-                psIP = IPAddress.Parse(Properties.Settings.Default.PSIP).GetAddressBytes();
-            }
-            else
-            {
-                Task.Run(() =>
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.PSIP))
+                {
+                    psIP = IPAddress.Parse(Properties.Settings.Default.PSIP).GetAddressBytes();
+                }
+                else
                 {
                     string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("gst.prod.dl.playstation.net") : ClassDNS.HostToIP("gst.prod.dl.playstation.net", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
@@ -158,16 +157,15 @@ namespace XboxDownload
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbPSIP, ip);
                         psIP = IPAddress.Parse(ip).GetAddressBytes();
                     }
-                });
-            }
-            Byte[]? nsIP = null;
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.NSIP))
+                }
+            });
+            tasks[3] = new Task(() =>
             {
-                nsIP = IPAddress.Parse(Properties.Settings.Default.NSIP).GetAddressBytes();
-            }
-            else
-            {
-                Task.Run(() =>
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.NSIP))
+                {
+                    nsIP = IPAddress.Parse(Properties.Settings.Default.NSIP).GetAddressBytes();
+                }
+                else
                 {
                     string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("atum.hac.lp1.d4c.nintendo.net") : ClassDNS.HostToIP("atum.hac.lp1.d4c.nintendo.net", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
@@ -175,16 +173,15 @@ namespace XboxDownload
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbNSIP, ip);
                         nsIP = IPAddress.Parse(ip).GetAddressBytes();
                     }
-                });
-            }
-            Byte[]? eaIP = null;
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.EAIP))
+                }
+            });
+            tasks[4] = new Task(() =>
             {
-                eaIP = IPAddress.Parse(Properties.Settings.Default.EAIP).GetAddressBytes();
-            }
-            else
-            {
-                Task.Run(() =>
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.EAIP))
+                {
+                    eaIP = IPAddress.Parse(Properties.Settings.Default.EAIP).GetAddressBytes();
+                }
+                else
                 {
                     string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("origin-a.akamaihd.net") : ClassDNS.HostToIP("origin-a.akamaihd.net", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
@@ -192,16 +189,15 @@ namespace XboxDownload
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbEAIP, ip);
                         eaIP = IPAddress.Parse(ip).GetAddressBytes();
                     }
-                });
-            }
-            Byte[]? battleIP = null;
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.BattleIP))
+                }
+            });
+            tasks[5] = new Task(() =>
             {
-                battleIP = IPAddress.Parse(Properties.Settings.Default.BattleIP).GetAddressBytes();
-            }
-            else
-            {
-                Task.Run(() =>
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.BattleIP))
+                {
+                    battleIP = IPAddress.Parse(Properties.Settings.Default.BattleIP).GetAddressBytes();
+                }
+                else
                 {
                     string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("blzddist1-a.akamaihd.net") : ClassDNS.HostToIP("blzddist1-a.akamaihd.net", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
@@ -209,7 +205,95 @@ namespace XboxDownload
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbBattleIP, ip);
                         battleIP = IPAddress.Parse(ip).GetAddressBytes();
                     }
-                });
+                }
+            });
+            Array.ForEach(tasks, x => x.Start());
+            Task.WaitAll(tasks);
+            if (!Form1.bServiceFlag) return;
+
+            dicService.Clear();
+            List<ResouceRecord> lsLocalIP = new() { new ResouceRecord { Datas = localIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+            if (Properties.Settings.Default.GameLink)
+            {
+                dicService.TryAdd("xvcf1.xboxlive.com", lsLocalIP);
+                dicService.TryAdd("assets1.xboxlive.com", lsLocalIP);
+                dicService.TryAdd("d1.xboxlive.com", lsLocalIP);
+                dicService.TryAdd("dlassets.xboxlive.com", lsLocalIP);
+                dicService.TryAdd("assets1.xboxlive.cn", lsLocalIP);
+                dicService.TryAdd("d1.xboxlive.cn", lsLocalIP);
+                dicService.TryAdd("dlassets.xboxlive.cn", lsLocalIP);
+                if (gameIP != null)
+                {
+                    List<ResouceRecord> lsGameIP = new() { new ResouceRecord { Datas = gameIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                    dicService.TryAdd("xvcf2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("assets2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("d2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("dlassets2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("assets2.xboxlive.cn", lsGameIP);
+                    dicService.TryAdd("d2.xboxlive.cn", lsGameIP);
+                    dicService.TryAdd("dlassets2.xboxlive.cn", lsGameIP);
+                }
+            }
+            else
+            {
+                if (gameIP != null)
+                {
+                    List<ResouceRecord> lsGameIP = new() { new ResouceRecord { Datas = gameIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                    dicService.TryAdd("xvcf1.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("xvcf2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("assets1.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("assets2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("d1.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("d2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("dlassets.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("dlassets2.xboxlive.com", lsGameIP);
+                    dicService.TryAdd("assets1.xboxlive.cn", lsGameIP);
+                    dicService.TryAdd("assets2.xboxlive.cn", lsGameIP);
+                    dicService.TryAdd("d1.xboxlive.cn", lsGameIP);
+                    dicService.TryAdd("d2.xboxlive.cn", lsGameIP);
+                    dicService.TryAdd("dlassets.xboxlive.cn", lsGameIP);
+                    dicService.TryAdd("dlassets2.xboxlive.cn", lsGameIP);
+                }
+            }
+            if (appIP != null)
+            {
+                List<ResouceRecord> lsAppIP = new() { new ResouceRecord { Datas = appIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                dicService.TryAdd("dl.delivery.mp.microsoft.com", lsAppIP);
+                dicService.TryAdd("tlu.dl.delivery.mp.microsoft.com", lsAppIP);
+            }
+            if (psIP != null)
+            {
+                List<ResouceRecord> lsPsIP = new() { new ResouceRecord { Datas = psIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                dicService.TryAdd("gst.prod.dl.playstation.net", lsPsIP);
+                dicService.TryAdd("gs2.ww.prod.dl.playstation.net", lsPsIP);
+                dicService.TryAdd("zeus.dl.playstation.net", lsPsIP);
+                dicService.TryAdd("ares.dl.playstation.net", lsPsIP);
+            }
+            if (nsIP != null)
+            {
+                List<ResouceRecord> lsNsIP = new() { new ResouceRecord { Datas = nsIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                dicService.TryAdd("atum.hac.lp1.d4c.nintendo.net", lsNsIP);
+                dicService.TryAdd("bugyo.hac.lp1.eshop.nintendo.net", lsNsIP);
+                dicService.TryAdd("ctest-dl-lp1.cdn.nintendo.net", lsNsIP);
+                dicService.TryAdd("ctest-ul-lp1.cdn.nintendo.net", lsNsIP);
+            }
+            dicService.TryAdd("atum-eda.hac.lp1.d4c.nintendo.net", new List<ResouceRecord>());
+            if (eaIP != null)
+            {
+                List<ResouceRecord> lsEaIP = new() { new ResouceRecord { Datas = eaIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                dicService.TryAdd("origin-a.akamaihd.net", lsEaIP);
+            }
+            if (battleIP != null)
+            {
+                List<ResouceRecord> lsBattleIP = new() { new ResouceRecord { Datas = battleIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                dicService.TryAdd("blzddist1-a.akamaihd.net", lsBattleIP);
+                dicService.TryAdd("blzddist2-a.akamaihd.net", lsBattleIP);
+                dicService.TryAdd("blzddist3-a.akamaihd.net", lsBattleIP);
+            }
+            if (Properties.Settings.Default.HttpService)
+            {
+                dicService.TryAdd("www.msftconnecttest.com", lsLocalIP);
+                dicService.TryAdd("ctest.cdn.nintendo.net", lsLocalIP);
             }
             if (Properties.Settings.Default.SetDns) ClassDNS.SetDns(Properties.Settings.Default.LocalIP);
             while (Form1.bServiceFlag)
@@ -224,217 +308,67 @@ namespace XboxDownload
                         var dns = new DNS(buff, read);
                         if (dns.QR == 0 && dns.Opcode == 0 && dns.Querys.Count == 1)
                         {
+                            string queryName = (dns.Querys[0].QueryName ?? string.Empty).ToLower();
                             switch (dns.Querys[0].QueryType)
                             {
                                 case QueryType.A:
-                                    string queryName = (dns.Querys[0].QueryName ?? string.Empty).ToLower();
-                                    Byte[]? byteIP = null;
-                                    int argb = 0;
-                                    if (Properties.Settings.Default.GameLink)
-                                    {
-                                        switch (queryName)
-                                        {
-                                            case "xvcf1.xboxlive.com":
-                                            case "assets1.xboxlive.com":
-                                            case "dlassets.xboxlive.com":
-                                            case "d1.xboxlive.com":
-                                            case "assets1.xboxlive.cn":
-                                            case "d1.xboxlive.cn":
-                                            case "dlassets.xboxlive.cn":
-                                                byteIP = localIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "xvcf2.xboxlive.com":
-                                            case "assets2.xboxlive.com":
-                                            case "dlassets2.xboxlive.com":
-                                            case "d2.xboxlive.com":
-                                            case "assets2.xboxlive.cn":
-                                            case "d2.xboxlive.cn":
-                                            case "dlassets2.xboxlive.cn":
-                                                byteIP = gameIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "dl.delivery.mp.microsoft.com":
-                                            case "tlu.dl.delivery.mp.microsoft.com":
-                                                byteIP = appIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "gst.prod.dl.playstation.net":
-                                            case "gs2.ww.prod.dl.playstation.net":
-                                            case "zeus.dl.playstation.net":
-                                            case "ares.dl.playstation.net":
-                                                byteIP = psIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "atum.hac.lp1.d4c.nintendo.net":
-                                            case "bugyo.hac.lp1.eshop.nintendo.net":
-                                            case "ctest-dl-lp1.cdn.nintendo.net":
-                                            case "ctest-ul-lp1.cdn.nintendo.net":
-                                                byteIP = nsIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "atum-eda.hac.lp1.d4c.nintendo.net":
-                                                byteIP = new byte[4];
-                                                argb = 0x008000;
-                                                break;
-                                            case "origin-a.akamaihd.net":
-                                                byteIP = eaIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "blzddist1-a.akamaihd.net":
-                                            case "blzddist2-a.akamaihd.net":
-                                            case "blzddist3-a.akamaihd.net":
-                                                byteIP = battleIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "ctest.cdn.nintendo.net":
-                                                if (Properties.Settings.Default.HttpService)
-                                                {
-                                                    byteIP = IPAddress.Parse(Properties.Settings.Default.LocalIP).GetAddressBytes();
-                                                    argb = 0x008000;
-                                                }
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        switch (queryName)
-                                        {
-                                            case "xvcf1.xboxlive.com":
-                                            case "xvcf2.xboxlive.com":
-                                            case "assets1.xboxlive.com":
-                                            case "assets2.xboxlive.com":
-                                            case "dlassets.xboxlive.com":
-                                            case "dlassets2.xboxlive.com":
-                                            case "d1.xboxlive.com":
-                                            case "d2.xboxlive.com":
-                                            case "assets1.xboxlive.cn":
-                                            case "assets2.xboxlive.cn":
-                                            case "d1.xboxlive.cn":
-                                            case "d2.xboxlive.cn":
-                                            case "dlassets.xboxlive.cn":
-                                            case "dlassets2.xboxlive.cn":
-                                                byteIP = gameIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "dl.delivery.mp.microsoft.com":
-                                            case "tlu.dl.delivery.mp.microsoft.com":
-                                                byteIP = appIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "gst.prod.dl.playstation.net":
-                                            case "gs2.ww.prod.dl.playstation.net":
-                                            case "zeus.dl.playstation.net":
-                                            case "ares.dl.playstation.net":
-                                                byteIP = psIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "atum.hac.lp1.d4c.nintendo.net":
-                                            case "bugyo.hac.lp1.eshop.nintendo.net":
-                                            case "ctest-dl-lp1.cdn.nintendo.net":
-                                            case "ctest-ul-lp1.cdn.nintendo.net":
-                                                byteIP = nsIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "atum-eda.hac.lp1.d4c.nintendo.net":
-                                                byteIP = new byte[4];
-                                                argb = 0x008000;
-                                                break;
-                                            case "origin-a.akamaihd.net":
-                                                byteIP = eaIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "blzddist1-a.akamaihd.net":
-                                            case "blzddist2-a.akamaihd.net":
-                                            case "blzddist3-a.akamaihd.net":
-                                                byteIP = battleIP;
-                                                argb = 0x008000;
-                                                break;
-                                            case "ctest.cdn.nintendo.net":
-                                                if (Properties.Settings.Default.HttpService)
-                                                {
-                                                    byteIP = IPAddress.Parse(Properties.Settings.Default.LocalIP).GetAddressBytes();
-                                                    argb = 0x008000;
-                                                }
-                                                break;
-                                        }
-                                    }
-                                    if (byteIP != null)
+                                    if (dicService.TryGetValue(queryName, out List<ResouceRecord>? lsServiceIp))
                                     {
                                         dns.QR = 1;
                                         dns.RA = 1;
                                         dns.RD = 1;
-                                        dns.ResouceRecords = new List<ResouceRecord>
-                                        {
-                                            new()
-                                            {
-                                                Datas = byteIP,
-                                                TTL = 100,
-                                                QueryClass = 1,
-                                                QueryType = QueryType.A
-                                            }
-                                        };
+                                        dns.ResouceRecords = lsServiceIp;
                                         socket?.SendTo(dns.ToBytes(), client);
-                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + (new IPAddress(byteIP)), ((IPEndPoint)client).Address.ToString(), argb);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsServiceIp.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x008000);
                                         return;
                                     }
-                                    if (dicHosts1.TryGetValue(queryName, out List<ResouceRecord>? lsIp))
+                                    if (dicHosts1.TryGetValue(queryName, out List<ResouceRecord>? lsHostsIp))
                                     {
-                                        argb = 0x0000FF;
-                                        List<ResouceRecord> lsResouceRecord = lsIp.ToList();
                                         dns.QR = 1;
                                         dns.RA = 1;
                                         dns.RD = 1;
-                                        dns.ResouceRecords = lsResouceRecord;
+                                        dns.ResouceRecords = lsHostsIp;
                                         socket?.SendTo(dns.ToBytes(), client);
-                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsHostsIp.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
                                         return;
                                     }
-                                    foreach (var item in dicHosts2)
+                                    var lsHostsIp2 = dicHosts2.Where(kvp => kvp.Key.IsMatch(queryName)).Select(x => x.Value).FirstOrDefault();
+                                    if (lsHostsIp2 != null)
                                     {
-                                        if (item.Key.IsMatch(queryName))
-                                        {
-                                            DnsListen.dicHosts1.TryAdd(queryName, item.Value);
-                                            argb = 0x0000FF;
-                                            List<ResouceRecord> lsResouceRecord = item.Value.ToList();
-                                            dns.QR = 1;
-                                            dns.RA = 1;
-                                            dns.RD = 1;
-                                            dns.ResouceRecords = lsResouceRecord;
-                                            socket?.SendTo(dns.ToBytes(), client);
-                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
-                                            return;
-                                        }
+                                        dicHosts1.TryAdd(queryName, lsHostsIp2);
+                                        dns.QR = 1;
+                                        dns.RA = 1;
+                                        dns.RD = 1;
+                                        dns.ResouceRecords = lsHostsIp2;
+                                        socket?.SendTo(dns.ToBytes(), client);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsHostsIp2.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
+                                        return;
                                     }
                                     if (Properties.Settings.Default.EnableCdnIP)
                                     {
-                                        if (dicCdn1.TryGetValue(queryName, out List<ResouceRecord>? lsIp2))
+                                        if (dicCdn1.TryGetValue(queryName, out List<ResouceRecord>? lsCdn))
                                         {
-                                            argb = 0x0000FF;
-                                            List<ResouceRecord> lsResouceRecord = lsIp2.OrderBy(a => Guid.NewGuid()).Take(16).ToList();
+                                            List<ResouceRecord> lsResouceRecord = lsCdn.OrderBy(a => Guid.NewGuid()).Take(16).ToList();
                                             dns.QR = 1;
                                             dns.RA = 1;
                                             dns.RD = 1;
                                             dns.ResouceRecords = lsResouceRecord;
                                             socket?.SendTo(dns.ToBytes(), client);
-                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
+                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
                                             return;
                                         }
-                                        foreach (var item in dicCdn2)
+                                        var lsCdn2 = dicCdn2.Where(kvp => kvp.Key.IsMatch(queryName)).Select(x => x.Value).FirstOrDefault();
+                                        if (lsCdn2 != null)
                                         {
-                                            if (item.Key.IsMatch(queryName))
-                                            {
-                                                DnsListen.dicCdn1.TryAdd(queryName, item.Value);
-                                                argb = 0x0000FF;
-                                                List<ResouceRecord> lsResouceRecord = item.Value.OrderBy(a => Guid.NewGuid()).Take(16).ToList();
-                                                dns.QR = 1;
-                                                dns.RA = 1;
-                                                dns.RD = 1;
-                                                dns.ResouceRecords = lsResouceRecord;
-                                                socket?.SendTo(dns.ToBytes(), client);
-                                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
-                                                return;
-                                            }
+                                            dicCdn1.TryAdd(queryName, lsCdn2);
+                                            List<ResouceRecord> lsResouceRecord = lsCdn2.OrderBy(a => Guid.NewGuid()).Take(16).ToList();
+                                            dns.QR = 1;
+                                            dns.RA = 1;
+                                            dns.RD = 1;
+                                            dns.ResouceRecords = lsResouceRecord;
+                                            socket?.SendTo(dns.ToBytes(), client);
+                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
+                                            return;
                                         }
                                     }
                                     if (Properties.Settings.Default.DoH && !reDoHBlacklist.IsMatch(queryName))
@@ -445,7 +379,7 @@ namespace XboxDownload
                                             ClassDNS.Api? json = null;
                                             try
                                             {
-                                                json = JsonSerializer.Deserialize<ClassDNS.Api>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                                json = JsonSerializer.Deserialize<ClassDNS.Api>(html, Form1.jsOptions);
                                             }
                                             catch { }
                                             if (json != null && json.Answer != null)
@@ -473,14 +407,14 @@ namespace XboxDownload
                                                     var arrIp = json.Answer.Where(x => x.Type == 1).Select(x => x.Data);
                                                     if (arrIp != null)
                                                     {
-                                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", arrIp.ToArray()), ((IPEndPoint)client).Address.ToString(), argb);
+                                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", arrIp.ToArray()), ((IPEndPoint)client).Address.ToString());
                                                     }
                                                     return;
                                                 }
                                             }
                                         }
                                     }
-                                    if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName, ((IPEndPoint)client).Address.ToString(), argb);
+                                    if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName, ((IPEndPoint)client).Address.ToString());
                                     break;
                                 case QueryType.AAAA:
                                     dns.QR = 1;
@@ -836,7 +770,7 @@ namespace XboxDownload
             {
                 try
                 {
-                    var json = JsonSerializer.Deserialize<ClassDNS.Api>(html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var json = JsonSerializer.Deserialize<ClassDNS.Api>(html, Form1.jsOptions);
                     if (json != null && json.Answer != null)
                     {
                         if (json.Status == 0 && json.Answer.Count >= 1)

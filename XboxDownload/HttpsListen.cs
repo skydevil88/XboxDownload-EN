@@ -207,7 +207,7 @@ namespace XboxDownload
                                                         XboxGameDownload.PackageFiles? packageFiles = null;
                                                         try
                                                         {
-                                                            var json = JsonSerializer.Deserialize<XboxGameDownload.Game>(socketPackage.Html, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                                            var json = JsonSerializer.Deserialize<XboxGameDownload.Game>(socketPackage.Html, Form1.jsOptions);
                                                             if (json != null && json.PackageFound)
                                                             {
                                                                 contentId = json.ContentId;
@@ -281,7 +281,7 @@ namespace XboxDownload
                                                         if (_filePath.StartsWith("/ecommerce2/downloadURL"))
                                                         {
                                                             m1 = Regex.Match(socketPackage.Html, @"<url>(?<url>.+)</url>");
-                                                            if (m1.Success) parentForm.SaveLog("下载地址", m1.Groups["url"].Value, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
+                                                            if (m1.Success) parentForm.SaveLog("Download Link", m1.Groups["url"].Value, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
                                                         }
                                                     }
                                                 }
@@ -332,7 +332,7 @@ namespace XboxDownload
             using X509Store store = new(StoreName.Root, StoreLocation.LocalMachine);
             store.Open(OpenFlags.ReadWrite);
             X509Certificate2Collection certificates = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, "CN=XboxDownload", false);
-            if (certificates.Count >= 1) store.RemoveRange(certificates);
+            if (certificates.Count > 0) store.RemoveRange(certificates);
             store.Close();
         }
     }

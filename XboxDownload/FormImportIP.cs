@@ -34,10 +34,6 @@ namespace XboxDownload
                 {
                     this.host = "Akamai";
                 }
-                else if (String.Equals(array[0].Trim(), "Playstation", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    this.host = "Playstation";
-                }
                 else
                 {
                     foreach (string str in array)
@@ -68,7 +64,7 @@ namespace XboxDownload
                 MessageBox.Show("Format does not match.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            Match result = Regex.Match(content, @"(?<IP>\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})\s*\((?<Location>[^\)]+)\)", RegexOptions.Multiline);
+            Match result = Regex.Match(content, @"(?<IP>\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})\s*\((?<Location>[^\)]*)\)|(?<IP>\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})(?<Location>[^\)]*)\d+ms|^\s*(?<IP>\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})\s*$", RegexOptions.Multiline);
             while (result.Success)
             {
                 string ip = result.Groups["IP"].Value;
