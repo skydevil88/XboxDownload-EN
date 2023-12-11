@@ -3,14 +3,12 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Text.Json;
 
 namespace XboxDownload
 {
     internal class HttpListen
     {
         private readonly Form1 parentForm;
-        private readonly ConcurrentDictionary<String, String> dicAppLocalUploadFile = new();
         Socket? socket = null;
 
         public HttpListen(Form1 parentForm)
@@ -82,11 +80,6 @@ namespace XboxDownload
                             _localPath = Properties.Settings.Default.LocalPath + _tmpPath.Replace("/", "\\");
                         else if (File.Exists(Properties.Settings.Default.LocalPath + "\\" + Path.GetFileName(_tmpPath)))
                             _localPath = Properties.Settings.Default.LocalPath + "\\" + Path.GetFileName(_tmpPath);
-                        else if (dicAppLocalUploadFile.ContainsKey(_filePath) && File.Exists(Properties.Settings.Default.LocalPath + "\\" + dicAppLocalUploadFile[_filePath]))
-                        {
-                            _tmpPath = dicAppLocalUploadFile[_filePath];
-                            _localPath = Properties.Settings.Default.LocalPath + "\\" + _tmpPath;
-                        }
                     }
                     string _extension = Path.GetExtension(_tmpPath).ToLowerInvariant();
                     if (Properties.Settings.Default.LocalUpload && !string.IsNullOrEmpty(_localPath))
@@ -250,67 +243,6 @@ namespace XboxDownload
                         {
                             bool bFileFound = false;
                             string _url = "http://" + _hosts + _filePath;
-                            /*
-                            if (_hosts == "dl.delivery.mp.microsoft.com" || _extension == ".phf" || _extension == ".json")
-                            {
-                                string? ip = ClassDNS.DoH(_hosts);
-                                if (!string.IsNullOrEmpty(ip))
-                                {
-                                    var headers = new Dictionary<string, string>() { { "Host", _hosts } };
-                                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(_url.Replace(_hosts, ip), "GET", null, null, headers);
-                                    if (response != null && response.IsSuccessStatusCode)
-                                    {
-                                        bFileFound = true;
-                                        byte[] buffer = response.Content.ReadAsByteArrayAsync().Result;
-                                        string str = "HTTP/1.1 200 OK\r\n" + Regex.Replace(response.Content.Headers.ToString(), @"^Content-Length: .+\r\n", "") + "Content-Length: " + buffer.Length + "\r\n" + response.Headers;
-                                        Byte[] _headers = Encoding.ASCII.GetBytes(str);
-                                        mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
-                                        mySocket.Send(buffer, 0, buffer.Length, SocketFlags.None, out _);
-                                        if (Properties.Settings.Default.RecordLog)
-                                        {
-                                            parentForm.SaveLog("HTTP " + ((int)response.StatusCode), _url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty);
-                                            if (_hosts.EndsWith(".prod.dl.playstation.net") && _extension == ".json")
-                                            {
-                                                string html = response.Content.ReadAsStringAsync().Result;
-                                                if (Regex.IsMatch(html, @"^{.+}$"))
-                                                {
-                                                    try
-                                                    {
-                                                        var json = JsonSerializer.Deserialize<PsGame.Game>(html, Form1.jsOptions);
-                                                        if (json != null && json.Pieces != null && json.Pieces.Count >= 1)
-                                                        {
-                                                            StringBuilder sbFile = new();
-                                                            sbFile.AppendLine("Total download files: " + json.NumberOfSplitFiles + "，Size：" + ClassMbr.ConvertBytes(Convert.ToUInt64(json.OriginalFileSize)) + "，download link: ");
-                                                            foreach (var pieces in json.Pieces)
-                                                                sbFile.AppendLine(pieces.Url);
-                                                            parentForm.SaveLog("Download Link", sbFile.ToString(), mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
-                                                        }
-                                                    }
-                                                    catch { }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else if (Properties.Settings.Default.LocalUpload && _hosts == "tlu.dl.delivery.mp.microsoft.com" && !dicAppLocalUploadFile.ContainsKey(_filePath))
-                            {
-                                string? ip = ClassDNS.DoH(_hosts);
-                                if (!string.IsNullOrEmpty(ip))
-                                {
-                                    var headers = new Dictionary<string, string>() { { "Host", _hosts } };
-                                    using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(_url.Replace(_hosts, ip), "HEAD", null, null, headers);
-                                    if (response != null && response.IsSuccessStatusCode)
-                                    {
-                                        if (response.Content.Headers.TryGetValues("Content-Disposition", out IEnumerable<string>? values))
-                                        {
-                                            string filename = Regex.Replace(values.FirstOrDefault() ?? string.Empty, @".+filename=", "");
-                                            dicAppLocalUploadFile.AddOrUpdate(_filePath, filename, (oldkey, oldvalue) => filename);
-                                        }
-                                    }
-                                }
-                            }
-                            */
                             if (_hosts == "tlu.dl.delivery.mp.microsoft.com")
                             {
                                 bFileFound = true;
@@ -323,24 +255,6 @@ namespace XboxDownload
                                 Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
                                 mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
                                 if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Download Link", _url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
-
-                                if (Properties.Settings.Default.LocalUpload && !dicAppLocalUploadFile.ContainsKey(_filePath))
-                                {
-                                    string? ip = ClassDNS.DoH(_hosts);
-                                    if (!string.IsNullOrEmpty(ip))
-                                    {
-                                        var headers = new Dictionary<string, string>() { { "Host", _hosts } };
-                                        using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(_url.Replace(_hosts, ip), "HEAD", null, null, headers);
-                                        if (response != null && response.IsSuccessStatusCode)
-                                        {
-                                            if (response.Content.Headers.TryGetValues("Content-Disposition", out IEnumerable<string>? values))
-                                            {
-                                                string filename = Regex.Replace(values.FirstOrDefault() ?? string.Empty, @".+filename=", "");
-                                                dicAppLocalUploadFile.AddOrUpdate(_filePath, filename, (oldkey, oldvalue) => filename);
-                                            }
-                                        }
-                                    }
-                                }
                             }
                             else if (_hosts == "www.msftconnecttest.com" && _tmpPath.ToLower() == "/connecttest.txt")
                             {
