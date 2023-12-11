@@ -466,7 +466,7 @@ namespace XboxDownload
             }
         }
 
-        public void ButStart_Click(object? sender, EventArgs? e)
+        public async void ButStart_Click(object? sender, EventArgs? e)
         {
             if (bServiceFlag)
             {
@@ -494,6 +494,26 @@ namespace XboxDownload
                 httpListen.Close();
                 httpsListen.Close();
                 Program.SystemSleep.RestoreForCurrentThread();
+                if (ckbSetDns.Checked)
+                {
+                    await Task.Run(() =>
+                    {
+                        string[] hosts = { "www.xbox.com", "www.playstation.com", "www.nintendo.com" };
+                        for (int i = 0; i < 15; i++)
+                        {
+                            IPHostEntry? hostEntry = null;
+                            try
+                            {
+                                hostEntry = Dns.GetHostEntry(hosts[i % hosts.Length]);
+                            }
+                            catch { }
+                            if (hostEntry == null)
+                                Thread.Sleep(1000);
+                            else
+                                break;
+                        }
+                    });
+                }
             }
             else
             {
@@ -764,7 +784,7 @@ namespace XboxDownload
                         control.Enabled = false;
                 }
                 cbLocalIP.Enabled = false;
-                Task.Run(() =>
+                _ = Task.Run(() =>
                 {
                     using HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://ipv6.lookup.test-ipv6.com/", "PUT");
                     if (response != null && response.IsSuccessStatusCode)

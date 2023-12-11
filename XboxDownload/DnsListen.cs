@@ -327,7 +327,7 @@ namespace XboxDownload
                                         dns.RD = 1;
                                         dns.ResouceRecords = lsServiceIp;
                                         socket?.SendTo(dns.ToBytes(), client);
-                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsServiceIp.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x008000);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsServiceIp.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x008000);
                                         return;
                                     }
                                     if (dicHosts1.TryGetValue(queryName, out List<ResouceRecord>? lsHostsIp))
@@ -337,7 +337,7 @@ namespace XboxDownload
                                         dns.RD = 1;
                                         dns.ResouceRecords = lsHostsIp;
                                         socket?.SendTo(dns.ToBytes(), client);
-                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsHostsIp.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsHostsIp.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
                                         return;
                                     }
                                     var lsHostsIp2 = dicHosts2.Where(kvp => kvp.Key.IsMatch(queryName)).Select(x => x.Value).FirstOrDefault();
@@ -349,7 +349,7 @@ namespace XboxDownload
                                         dns.RD = 1;
                                         dns.ResouceRecords = lsHostsIp2;
                                         socket?.SendTo(dns.ToBytes(), client);
-                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsHostsIp2.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsHostsIp2.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
                                         return;
                                     }
                                     if (Properties.Settings.Default.EnableCdnIP)
@@ -362,7 +362,7 @@ namespace XboxDownload
                                             dns.RD = 1;
                                             dns.ResouceRecords = lsResouceRecord;
                                             socket?.SendTo(dns.ToBytes(), client);
-                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
+                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
                                             return;
                                         }
                                         var lsCdn2 = dicCdn2.Where(kvp => kvp.Key.IsMatch(queryName)).Select(x => x.Value).FirstOrDefault();
@@ -375,7 +375,7 @@ namespace XboxDownload
                                             dns.RD = 1;
                                             dns.ResouceRecords = lsResouceRecord;
                                             socket?.SendTo(dns.ToBytes(), client);
-                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS 查询", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
+                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsResouceRecord.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
                                             return;
                                         }
                                     }
