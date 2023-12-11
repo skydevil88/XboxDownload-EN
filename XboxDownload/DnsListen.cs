@@ -135,7 +135,7 @@ namespace XboxDownload
                 }
                 else
                 {
-                    string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("tlu.dl.delivery.mp.microsoft.com") : ClassDNS.HostToIP("tlu.dl.delivery.mp.microsoft.com", Properties.Settings.Default.DnsIP);
+                    string? ip = Properties.Settings.Default.DoH ? ClassDNS.DoH("dl.delivery.mp.microsoft.com") : ClassDNS.HostToIP("dl.delivery.mp.microsoft.com", Properties.Settings.Default.DnsIP);
                     if (!string.IsNullOrEmpty(ip))
                     {
                         if (Form1.bServiceFlag) parentForm.SetTextBox(parentForm.tbAppIP, ip);
@@ -233,6 +233,13 @@ namespace XboxDownload
                     dicService.TryAdd("d2.xboxlive.cn", lsGameIP);
                     dicService.TryAdd("dlassets2.xboxlive.cn", lsGameIP);
                 }
+                if (appIP != null)
+                {
+                    List<ResouceRecord> lsAppIP = new() { new ResouceRecord { Datas = appIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                    dicService.TryAdd("dl.delivery.mp.microsoft.com", lsAppIP);
+                    dicService.TryAdd("tlu.dl.delivery.mp.microsoft.com", lsLocalIP);
+                    dicService.TryAdd("2.tlu.dl.delivery.mp.microsoft.com", lsAppIP);
+                }
             }
             else
             {
@@ -254,12 +261,13 @@ namespace XboxDownload
                     dicService.TryAdd("dlassets.xboxlive.cn", lsGameIP);
                     dicService.TryAdd("dlassets2.xboxlive.cn", lsGameIP);
                 }
-            }
-            if (appIP != null)
-            {
-                List<ResouceRecord> lsAppIP = new() { new ResouceRecord { Datas = appIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
-                dicService.TryAdd("dl.delivery.mp.microsoft.com", lsAppIP);
-                dicService.TryAdd("tlu.dl.delivery.mp.microsoft.com", lsAppIP);
+                if (appIP != null)
+                {
+                    List<ResouceRecord> lsAppIP = new() { new ResouceRecord { Datas = appIP, TTL = 100, QueryClass = 1, QueryType = QueryType.A } };
+                    dicService.TryAdd("dl.delivery.mp.microsoft.com", lsAppIP);
+                    dicService.TryAdd("tlu.dl.delivery.mp.microsoft.com", lsAppIP);
+                    dicService.TryAdd("2.tlu.dl.delivery.mp.microsoft.com", lsAppIP);
+                }
             }
             if (psIP != null)
             {

@@ -173,9 +173,10 @@ namespace XboxDownload
                             }
                             else
                             {
-                                bool bFileNotFound = true;
+                                bool bFileFound = false;
                                 switch (_hosts)
                                 {
+                                    /*
                                     case "packagespc.xboxlive.com":
                                         {
                                             string? ip = ClassDNS.DoH(_hosts);
@@ -192,7 +193,7 @@ namespace XboxDownload
                                                 SocketPackage socketPackage = ClassWeb.TlsRequest(uri, Encoding.ASCII.GetBytes(_buffer), ip, true);
                                                 if (string.IsNullOrEmpty(socketPackage.Err))
                                                 {
-                                                    bFileNotFound = false;
+                                                    bFileFound = true;
                                                     string str = socketPackage.Headers;
                                                     str = Regex.Replace(str, @"(Content-Encoding|Transfer-Encoding|Content-Length): .+\r\n", "");
                                                     str = Regex.Replace(str, @"\r\n\r\n", "\r\nContent-Length: " + socketPackage.Buffer.Length + "\r\n\r\n");
@@ -208,6 +209,74 @@ namespace XboxDownload
                                                         try
                                                         {
                                                             var json = JsonSerializer.Deserialize<XboxGameDownload.Game>(socketPackage.Html, Form1.jsOptions);
+                                                            if (json != null && json.PackageFound)
+                                                            {
+                                                                contentId = json.ContentId;
+                                                                packageFiles = json.PackageFiles.Where(x => x.RelativeUrl.ToLower().EndsWith(".msixvc")).FirstOrDefault();
+                                                            }
+                                                        }
+                                                        catch { }
+                                                        if (packageFiles != null)
+                                                        {
+                                                            string url = packageFiles.CdnRootPaths[0] + packageFiles.RelativeUrl;
+                                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Download Link", url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
+                                                            Match m2 = Regex.Match(url, @"(?<version>\d+\.\d+\.\d+\.\d+)\.\w{8}-\w{4}-\w{4}-\w{4}-\w{12}");
+                                                            if (m2.Success)
+                                                            {
+                                                                Version version = new(m2.Groups["version"].Value);
+                                                                string key = (contentId ?? string.Empty).ToLower();
+                                                                if (XboxGameDownload.dicXboxGame.TryGetValue(key, out XboxGameDownload.Products? XboxGame))
+                                                                {
+                                                                    if (XboxGame.Version >= version) return;
+                                                                }
+                                                                XboxGame = new XboxGameDownload.Products
+                                                                {
+                                                                    Version = version,
+                                                                    FileSize = packageFiles.FileSize,
+                                                                    Url = url.Replace(".xboxlive.cn", ".xboxlive.com")
+                                                                };
+                                                                XboxGameDownload.dicXboxGame.AddOrUpdate(key, XboxGame, (oldkey, oldvalue) => XboxGame);
+                                                                XboxGameDownload.SaveXboxGame();
+                                                                _ = ClassWeb.HttpResponseContent(UpdateFile.homePage + "/Game/AddGameUrl?url=" + ClassWeb.UrlEncode(XboxGame.Url), "PUT", null, null, null, 30000, "XboxDownload");
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        break;
+                                        */
+                                    case "packagespc.xboxlive.com":
+                                        {
+                                            string? ip = ClassDNS.DoH(_hosts);
+                                            if (!string.IsNullOrEmpty(ip))
+                                            {
+                                                Match m1 = Regex.Match(_buffer, @"Authorization:(.+)");
+                                                if (m1.Success)
+                                                {
+                                                    Properties.Settings.Default.Authorization = m1.Groups[1].Value.Trim();
+                                                    Properties.Settings.Default.Save();
+                                                }
+                                                string _url = "https://" + _hosts + _filePath;
+                                                var headers = new Dictionary<string, string>() { { "Host", _hosts }, { "Authorization", Properties.Settings.Default.Authorization } };
+                                                using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(_url.Replace(_hosts, ip), "GET", null, null, headers);
+                                                if (response != null && response.IsSuccessStatusCode)
+                                                {
+                                                    bFileFound = true;
+                                                    byte[] buffer = response.Content.ReadAsByteArrayAsync().Result;
+                                                    string str = "HTTP/1.1 200 OK\r\n" + Regex.Replace(response.Content.Headers.ToString(), @"Content-Length: .+\r\n", "") + "Content-Length: " + buffer.Length + "\r\n" + response.Headers;
+                                                    Byte[] _headers = Encoding.ASCII.GetBytes(str.Trim() + "\r\n\r\n");
+                                                    ssl.Write(_headers);
+                                                    ssl.Write(buffer);
+                                                    ssl.Flush();
+                                                    string html = response.Content.ReadAsStringAsync().Result;
+                                                    if (Regex.IsMatch(html, @"^{.+}$"))
+                                                    {
+                                                        string? contentId = null;
+                                                        XboxGameDownload.PackageFiles? packageFiles = null;
+                                                        try
+                                                        {
+                                                            var json = JsonSerializer.Deserialize<XboxGameDownload.Game>(html, Form1.jsOptions);
                                                             if (json != null && json.PackageFound)
                                                             {
                                                                 contentId = json.ContentId;
@@ -266,7 +335,7 @@ namespace XboxDownload
                                                 SocketPackage socketPackage = ClassWeb.TlsRequest(uri, Encoding.ASCII.GetBytes(_buffer), ip, decode);
                                                 if (string.IsNullOrEmpty(socketPackage.Err))
                                                 {
-                                                    bFileNotFound = false;
+                                                    bFileFound = true;
                                                     string str = socketPackage.Headers;
                                                     str = Regex.Replace(str, @"(Content-Encoding|Transfer-Encoding|Content-Length): .+\r\n", "");
                                                     str = Regex.Replace(str, @"\r\n\r\n", "\r\nContent-Length: " + socketPackage.Buffer.Length + "\r\n\r\n");
@@ -289,7 +358,7 @@ namespace XboxDownload
                                         }
                                         break;
                                 }
-                                if (bFileNotFound)
+                                if (!bFileFound)
                                 {
                                     string _url = "https://" + _hosts + _filePath;
                                     Byte[] _response = Encoding.ASCII.GetBytes("File not found.");

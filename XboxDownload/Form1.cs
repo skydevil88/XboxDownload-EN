@@ -916,6 +916,13 @@ namespace XboxDownload
                             sb.AppendLine(Properties.Settings.Default.GameIP + " assets2.xboxlive.cn");
                             sb.AppendLine(Properties.Settings.Default.GameIP + " d2.xboxlive.cn");
                             sb.AppendLine(Properties.Settings.Default.GameIP + " dlassets2.xboxlive.cn");
+
+                            if (!string.IsNullOrEmpty(Properties.Settings.Default.AppIP))
+                            {
+                                sb.AppendLine(Properties.Settings.Default.AppIP + " dl.delivery.mp.microsoft.com");
+                                sb.AppendLine(Properties.Settings.Default.AppIP + " 2.tlu.dl.delivery.mp.microsoft.com");
+                            }
+                            sb.AppendLine(Properties.Settings.Default.LocalIP + " tlu.dl.delivery.mp.microsoft.com");
                         }
                         else if (Properties.Settings.Default.GameLink)
                         {
@@ -926,12 +933,12 @@ namespace XboxDownload
                             sb.AppendLine(Properties.Settings.Default.LocalIP + " assets1.xboxlive.cn");
                             sb.AppendLine(Properties.Settings.Default.LocalIP + " d1.xboxlive.cn");
                             sb.AppendLine(Properties.Settings.Default.LocalIP + " dlassets.xboxlive.cn");
-                        }
-
-                        if (!string.IsNullOrEmpty(Properties.Settings.Default.AppIP))
-                        {
-                            sb.AppendLine(Properties.Settings.Default.AppIP + " dl.delivery.mp.microsoft.com");
-                            sb.AppendLine(Properties.Settings.Default.AppIP + " tlu.dl.delivery.mp.microsoft.com");
+                            if (!string.IsNullOrEmpty(Properties.Settings.Default.AppIP))
+                            {
+                                sb.AppendLine(Properties.Settings.Default.AppIP + " dl.delivery.mp.microsoft.com");
+                                sb.AppendLine(Properties.Settings.Default.AppIP + " tlu.dl.delivery.mp.microsoft.com");
+                                sb.AppendLine(Properties.Settings.Default.AppIP + " 2.tlu.dl.delivery.mp.microsoft.com");
+                            }
                         }
                         if (Properties.Settings.Default.HttpService)
                         {

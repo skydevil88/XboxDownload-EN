@@ -220,13 +220,13 @@
     <value>Content (right click to copy)</value>
   </data>
   <data name="Col_Content.Width" type="System.Int32, mscorlib">
-    <value>645</value>
+    <value>640</value>
   </data>
   <data name="Col_ClientIP.Text" xml:space="preserve">
     <value>Client IP</value>
   </data>
   <data name="Col_ClientIP.Width" type="System.Int32, mscorlib">
-    <value>100</value>
+    <value>105</value>
   </data>
   <data name="Col_Time.Text" xml:space="preserve">
     <value>Time</value>
