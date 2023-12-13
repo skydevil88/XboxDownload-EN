@@ -71,14 +71,14 @@ namespace XboxDownload
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         [DllImport("User32.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr FindWindow(string IpClassName, string? IpWindowName);
+        private static extern IntPtr FindWindow(string? IpClassName, string? IpWindowName);
 
         private const int SW_SHOWNOMAL = 1;
         private static void HandleRunningInstance(Process instance)
         {
             IntPtr ihand = instance.MainWindowHandle;
             if (ihand == IntPtr.Zero)
-                ihand = Program.FindWindow("WindowsForms10.Window.8.app.0.297b065_r3_ad1", null);
+                ihand = Program.FindWindow(null, "Xbox Download");
             if (ihand == IntPtr.Zero)
             {
                 MessageBox.Show("This program has already started, do not run multiple programs at the same time.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Warning);

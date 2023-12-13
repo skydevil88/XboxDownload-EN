@@ -1,6 +1,7 @@
 ##################### Microsoft ######################
 catalog.gamepass.com
 download.xbox.com		#Xbox360 download domain name
+*.video.microsoft.com	#Movies & TV
 
 ###################### Nintendo ######################
 *.hac.lp1.d4c.nintendo.net
