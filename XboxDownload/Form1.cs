@@ -104,7 +104,7 @@ namespace XboxDownload
 
             tbIpLocation.Text = Properties.Settings.Default.IpLocation;
 
-            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up && x.NetworkInterfaceType != NetworkInterfaceType.Loopback && (x.NetworkInterfaceType == NetworkInterfaceType.Ethernet || x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && !x.Description.Contains("Virtual")).ToArray();
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up && x.NetworkInterfaceType != NetworkInterfaceType.Loopback && (x.NetworkInterfaceType == NetworkInterfaceType.Ethernet || x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && !x.Description.Contains("Virtual", StringComparison.OrdinalIgnoreCase)).ToArray();
             foreach (NetworkInterface adapter in adapters)
             {
                 IPInterfaceProperties adapterProperties = adapter.GetIPProperties();
@@ -217,7 +217,7 @@ namespace XboxDownload
                 linkAppxAdd.Enabled = false;
                 gbAddAppxPackage.Visible = gbGamingServices.Visible = false;
             }
-
+            DnsListen.UpdateHosts();
             if (File.Exists(resourcePath + "\\XboxGame.json"))
             {
                 string json = File.ReadAllText(resourcePath + "\\XboxGame.json");
@@ -516,9 +516,9 @@ namespace XboxDownload
             else
             {
                 string? dnsIP = null;
-                if (!string.IsNullOrEmpty(tbDnsIP.Text.Trim()))
+                if (!string.IsNullOrWhiteSpace(tbDnsIP.Text))
                 {
-                    if (IPAddress.TryParse(tbDnsIP.Text, out IPAddress? ipAddress) && !IPAddress.IsLoopback(ipAddress))
+                    if (IPAddress.TryParse(tbDnsIP.Text.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ipAddress))
                     {
                         dnsIP = tbDnsIP.Text = ipAddress.ToString();
                     }
@@ -530,9 +530,9 @@ namespace XboxDownload
                     }
                 }
                 string? gameIP = null;
-                if (!string.IsNullOrEmpty(tbGameIP.Text.Trim()))
+                if (!string.IsNullOrWhiteSpace(tbGameIP.Text))
                 {
-                    if (IPAddress.TryParse(tbGameIP.Text, out IPAddress? ipAddress))
+                    if (IPAddress.TryParse(tbGameIP.Text.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                     {
                         gameIP = tbGameIP.Text = ipAddress.ToString();
                     }
@@ -544,9 +544,9 @@ namespace XboxDownload
                     }
                 }
                 string? appIP = null;
-                if (!string.IsNullOrEmpty(tbAppIP.Text.Trim()))
+                if (!string.IsNullOrWhiteSpace(tbAppIP.Text))
                 {
-                    if (IPAddress.TryParse(tbAppIP.Text, out IPAddress? ipAddress))
+                    if (IPAddress.TryParse(tbAppIP.Text.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                     {
                         appIP = tbAppIP.Text = ipAddress.ToString();
                     }
@@ -558,9 +558,9 @@ namespace XboxDownload
                     }
                 }
                 string? psIP = null;
-                if (!string.IsNullOrEmpty(tbPSIP.Text.Trim()))
+                if (!string.IsNullOrWhiteSpace(tbPSIP.Text))
                 {
-                    if (IPAddress.TryParse(tbPSIP.Text, out IPAddress? ipAddress))
+                    if (IPAddress.TryParse(tbPSIP.Text.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                     {
                         psIP = tbPSIP.Text = ipAddress.ToString();
                     }
@@ -572,9 +572,9 @@ namespace XboxDownload
                     }
                 }
                 string? nsIP = null;
-                if (!string.IsNullOrEmpty(tbNSIP.Text.Trim()))
+                if (!string.IsNullOrWhiteSpace(tbNSIP.Text))
                 {
-                    if (IPAddress.TryParse(tbNSIP.Text, out IPAddress? ipAddress))
+                    if (IPAddress.TryParse(tbNSIP.Text.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                     {
                         nsIP = tbNSIP.Text = ipAddress.ToString();
                     }
@@ -586,9 +586,9 @@ namespace XboxDownload
                     }
                 }
                 string? eaIP = null;
-                if (!string.IsNullOrEmpty(tbEAIP.Text.Trim()))
+                if (!string.IsNullOrWhiteSpace(tbEAIP.Text))
                 {
-                    if (IPAddress.TryParse(tbEAIP.Text, out IPAddress? ipAddress))
+                    if (IPAddress.TryParse(tbEAIP.Text.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                     {
                         eaIP = tbEAIP.Text = ipAddress.ToString();
                     }
@@ -600,9 +600,9 @@ namespace XboxDownload
                     }
                 }
                 string? battleIP = null;
-                if (!string.IsNullOrEmpty(tbBattleIP.Text.Trim()))
+                if (!string.IsNullOrWhiteSpace(tbBattleIP.Text))
                 {
-                    if (IPAddress.TryParse(tbBattleIP.Text, out IPAddress? ipAddress))
+                    if (IPAddress.TryParse(tbBattleIP.Text.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                     {
                         battleIP = tbBattleIP.Text = ipAddress.ToString();
                     }
@@ -790,7 +790,6 @@ namespace XboxDownload
                         SaveLog("Notes", "Detected it's using with IPv6, if connect Xbox|PS console, disable IPv6 through the router.", "localhost", 0x0000FF);
                     }
                 });
-                DnsListen.UpdateHosts();
                 UpdateHosts(true);
                 if (Properties.Settings.Default.DnsService)
                 {
@@ -934,14 +933,16 @@ namespace XboxDownload
                             sb.AppendLine(Properties.Settings.Default.BattleIP + " blzddist3-a.akamaihd.net");
                         }
                     }
-                    if (!Properties.Settings.Default.SetDns)
+                    DataTable dt = Form1.dtHosts.Copy();
+                    dt.RejectChanges();
+                    foreach (DataRow dr in dt.Rows)
                     {
-                        foreach (var item in DnsListen.dicHosts1)
+                        if (!Convert.ToBoolean(dr["Enable"])) continue;
+                        string? hostName = dr["HostName"].ToString()?.ToLower();
+                        string? ip = dr["IPv4"].ToString()?.Trim();
+                        if (!string.IsNullOrEmpty(hostName) && !hostName.StartsWith("*.") && !string.IsNullOrEmpty(ip))
                         {
-                            if (item.Key == Environment.MachineName)
-                                continue;
-                            byte[]? b = item.Value[0].Datas;
-                            if (b != null) sb.AppendLine(new IPAddress(b) + " " + item.Key);
+                            sb.AppendLine(ip + " " + hostName);
                         }
                     }
                     sb.AppendLine("# End of XboxDownload");
@@ -958,6 +959,36 @@ namespace XboxDownload
             {
                 if (add) MessageBox.Show("Failed to modify the system Hosts file, message£º" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            if (Properties.Settings.Default.MicrosoftStore) ThreadPool.QueueUserWorkItem(delegate { RestartService("DoSvc"); });
+        }
+
+        private static void RestartService(string servicename)
+        {
+            Task.Run(() =>
+            {
+                ServiceController? service = ServiceController.GetServices().Where(s => s.ServiceName == servicename).SingleOrDefault();
+                if (service != null)
+                {
+                    TimeSpan timeout = TimeSpan.FromMilliseconds(30000);
+                    try
+                    {
+                        if (service.Status == ServiceControllerStatus.Running)
+                        {
+                            service.Stop();
+                            service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                        }
+                        if (service.Status != ServiceControllerStatus.Running)
+                        {
+                            service.Start();
+                            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+            });
         }
 
         private void LvLog_MouseClick(object sender, MouseEventArgs e)
@@ -1871,7 +1902,7 @@ namespace XboxDownload
                 case "Col_IPv4":
                     if (!string.IsNullOrWhiteSpace(e.FormattedValue.ToString()))
                     {
-                        if (!IPAddress.TryParse(e.FormattedValue.ToString()?.Trim(), out _))
+                        if (!(IPAddress.TryParse(e.FormattedValue.ToString()?.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork))
                         {
                             e.Cancel = true;
                             dgvHosts.Rows[e.RowIndex].ErrorText = "Incorrect IPv4";
@@ -1907,11 +1938,8 @@ namespace XboxDownload
                 File.Delete(resourcePath + "\\Hosts.xml");
             }
             dgvHosts.ClearSelection();
-            if (bServiceFlag)
-            {
-                DnsListen.UpdateHosts();
-                if (!Properties.Settings.Default.SetDns) UpdateHosts(true);
-            }
+            DnsListen.UpdateHosts();
+            if (bServiceFlag) UpdateHosts(true);
         }
 
         private void ButHostReset_Click(object sender, EventArgs e)
@@ -2035,19 +2063,19 @@ namespace XboxDownload
 
         private void ButCdnSave_Click(object sender, EventArgs e)
         {
-            List<string> lsIpTmp = new();
+            List<string> lsIp = new();
             foreach (string str in tbCdnAkamai.Text.Replace("£¬", ",").Split(','))
             {
-                if (IPAddress.TryParse(str.Trim(), out IPAddress? address))
+                if (IPAddress.TryParse(str.Trim(), out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    string ip = address.ToString();
-                    if (!lsIpTmp.Contains(ip))
+                    string ip = ipAddress.ToString();
+                    if (!lsIp.Contains(ip))
                     {
-                        lsIpTmp.Add(ip);
+                        lsIp.Add(ip);
                     }
                 }
             }
-            tbCdnAkamai.Text = string.Join(", ", lsIpTmp.ToArray());
+            tbCdnAkamai.Text = string.Join(", ", lsIp.ToArray());
             if (string.IsNullOrWhiteSpace(tbHosts2Akamai.Text))
             {
                 if (File.Exists(resourcePath + "\\" + "Akamai.txt")) File.Delete(resourcePath + "\\" + "Akamai.txt");
@@ -2060,11 +2088,7 @@ namespace XboxDownload
             Properties.Settings.Default.IpsAkamai = tbCdnAkamai.Text;
             Properties.Settings.Default.EnableCdnIP = ckbEnableCdnIP.Checked;
             Properties.Settings.Default.Save();
-            if (bServiceFlag)
-            {
-                DnsListen.UpdateHosts();
-                if (!Properties.Settings.Default.SetDns) UpdateHosts(true);
-            }
+            DnsListen.UpdateHosts();
         }
 
         private void ButCdnReset_Click(object sender, EventArgs e)
@@ -3206,7 +3230,7 @@ namespace XboxDownload
                                     }
                                 }
                             }
-                            else if ((int)response.StatusCode == 401)
+                            else if (response.StatusCode == HttpStatusCode.Unauthorized)
                             {
                                 Properties.Settings.Default.Authorization = null;
                                 Properties.Settings.Default.Save();
