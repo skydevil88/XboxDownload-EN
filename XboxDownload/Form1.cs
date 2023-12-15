@@ -959,6 +959,36 @@ namespace XboxDownload
             {
                 if (add) MessageBox.Show("Failed to modify the system Hosts file, message£º" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            if (Properties.Settings.Default.MicrosoftStore) ThreadPool.QueueUserWorkItem(delegate { RestartService("DoSvc"); });
+        }
+
+        private static void RestartService(string servicename)
+        {
+            Task.Run(() =>
+            {
+                ServiceController? service = ServiceController.GetServices().Where(s => s.ServiceName == servicename).SingleOrDefault();
+                if (service != null)
+                {
+                    TimeSpan timeout = TimeSpan.FromMilliseconds(30000);
+                    try
+                    {
+                        if (service.Status == ServiceControllerStatus.Running)
+                        {
+                            service.Stop();
+                            service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                        }
+                        if (service.Status != ServiceControllerStatus.Running)
+                        {
+                            service.Start();
+                            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+            });
         }
 
         private void LvLog_MouseClick(object sender, MouseEventArgs e)
