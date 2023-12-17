@@ -4145,7 +4145,7 @@ When computer has multiple IPs, make sure the "Local IP" is on the same network 
     <value>Microsoft YaHei UI, 7pt</value>
   </data>
   <data name="label42.Location" type="System.Drawing.Point, System.Drawing">
-    <value>78, 321</value>
+    <value>68, 321</value>
   </data>
   <data name="label42.Size" type="System.Drawing.Size, System.Drawing">
     <value>980, 20</value>
