@@ -1629,25 +1629,25 @@ When computer has multiple IPs, make sure the "Local IP" is on the same network 
     <value>True</value>
   </metadata>
   <data name="Col_IP.HeaderText" xml:space="preserve">
-    <value>IPv4</value>
+    <value>IPv4 (right click to show options)</value>
   </data>
   <data name="Col_IP.MinimumWidth" type="System.Int32, mscorlib">
     <value>8</value>
   </data>
   <data name="Col_IP.Width" type="System.Int32, mscorlib">
-    <value>190</value>
+    <value>220</value>
   </data>
   <metadata name="Col_Location.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="Col_Location.HeaderText" xml:space="preserve">
-    <value>Location (right click to show options)</value>
+    <value>Location</value>
   </data>
   <data name="Col_Location.MinimumWidth" type="System.Int32, mscorlib">
     <value>8</value>
   </data>
   <data name="Col_Location.Width" type="System.Int32, mscorlib">
-    <value>340</value>
+    <value>300</value>
   </data>
   <metadata name="Col_302.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -1789,6 +1789,9 @@ When computer has multiple IPs, make sure the "Local IP" is on the same network 
   </data>
   <data name="cbImportIP.Items1" xml:space="preserve">
     <value>1. Akamai</value>
+  </data>
+  <data name="cbImportIP.Items2" xml:space="preserve">
+    <value>2. Akamai (IPv6)</value>
   </data>
   <data name="cbImportIP.Location" type="System.Drawing.Point, System.Drawing">
     <value>928, 4</value>

@@ -901,7 +901,7 @@
             // 
             cbImportIP.DropDownStyle = ComboBoxStyle.DropDownList;
             cbImportIP.FormattingEnabled = true;
-            cbImportIP.Items.AddRange(new object[] { resources.GetString("cbImportIP.Items"), resources.GetString("cbImportIP.Items1") });
+            cbImportIP.Items.AddRange(new object[] { resources.GetString("cbImportIP.Items"), resources.GetString("cbImportIP.Items1"), resources.GetString("cbImportIP.Items2") });
             resources.ApplyResources(cbImportIP, "cbImportIP");
             cbImportIP.Name = "cbImportIP";
             cbImportIP.SelectedIndexChanged += CbImportIP_SelectedIndexChanged;
@@ -2461,13 +2461,6 @@
         private DataGridViewTextBoxColumn Col_IPv4;
         private DataGridViewTextBoxColumn Col_Remark;
         private LinkLabel linkLabel1;
-        private DataGridViewCheckBoxColumn Col_Check;
-        private DataGridViewTextBoxColumn Col_IP;
-        private DataGridViewTextBoxColumn Col_Location;
-        private DataGridViewCheckBoxColumn Col_302;
-        private DataGridViewTextBoxColumn Col_TTL;
-        private DataGridViewTextBoxColumn Col_RoundtripTime;
-        private DataGridViewTextBoxColumn Col_Speed;
         private CheckBox ckbSelectAll;
         private Label label1;
         private TextBox tbIpLocation;
@@ -2478,5 +2471,12 @@
         private ToolStripMenuItem tsmTeaching;
         private ToolStripMenuItem tsmTeaching1;
         private LinkLabel linkConsoleInstall;
+        private DataGridViewCheckBoxColumn Col_Check;
+        private DataGridViewTextBoxColumn Col_IP;
+        private DataGridViewTextBoxColumn Col_Location;
+        private DataGridViewCheckBoxColumn Col_302;
+        private DataGridViewTextBoxColumn Col_TTL;
+        private DataGridViewTextBoxColumn Col_RoundtripTime;
+        private DataGridViewTextBoxColumn Col_Speed;
     }
 }

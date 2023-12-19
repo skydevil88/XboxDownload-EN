@@ -1194,7 +1194,7 @@ namespace XboxDownload
             }
             if (rowIndex >= 1) dgvIpList.Rows[0].Cells[0].Selected = true;
         }
-
+        
         private async void CbImportIP_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbImportIP.SelectedIndex == 0) return;
@@ -1209,6 +1209,9 @@ namespace XboxDownload
             {
                 case 1:
                     host = "Akamai";
+                    break;
+                case 2:
+                    host = "AkamaiV6";
                     break;
             }
             dgvIpList.Tag = host;
@@ -1229,7 +1232,7 @@ namespace XboxDownload
             }
 
             List<DataGridViewRow> list = new();
-            Match result = Regex.Match(content, @"(?<IP>\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})\s*\((?<Location>[^\)]+)\)|(?<IP>\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})(?<Location>.+)\dms|^\s*(?<IP>\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})\s*$", RegexOptions.Multiline);
+            Match result = FormImportIP.rMatchIP.Match(content);
             if (result.Success)
             {
                 while (result.Success)
@@ -1261,6 +1264,7 @@ namespace XboxDownload
             switch (host)
             {
                 case "Akamai":
+                case "AkamaiV6":
                     {
                         LinkLabel lb1 = new()
                         {
@@ -1278,14 +1282,17 @@ namespace XboxDownload
                             Parent = this.flpTestUrl
                         };
                         lb2.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
-                        LinkLabel lb13 = new()
+                        if (host != "AkamaiV6")
                         {
-                            Tag = "http://ctest-dl-lp1.cdn.nintendo.net/30m",
-                            Text = "Switch file",
-                            AutoSize = true,
-                            Parent = this.flpTestUrl
-                        };
-                        lb13.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
+                            LinkLabel lb13 = new()
+                            {
+                                Tag = "http://ctest-dl-lp1.cdn.nintendo.net/30m",
+                                Text = "Switch file",
+                                AutoSize = true,
+                                Parent = this.flpTestUrl
+                            };
+                            lb13.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
+                        }
                         LinkLabel lb4 = new()
                         {
                             Tag = "http://origin-a.akamaihd.net/Origin-Client-Download/origin/live/OriginThinSetup.exe",
@@ -1413,6 +1420,7 @@ namespace XboxDownload
                 switch (host)
                 {
                     case "Akamai":
+                    case "AkamaiV6":
                         sHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+[^\s]+(\.xboxlive\.com|\.xboxlive\.cn|\.delivery\.mp\.microsoft\.com|\.dl\.playstation\.net|\.nintendo\.net|\.cdn\.ea\.com|\.akamaihd\.net)\s+# XboxDownload\r\n", "");
                         sb.AppendLine(ip + " xvcf1.xboxlive.com # XboxDownload");
                         sb.AppendLine(ip + " xvcf2.xboxlive.com # XboxDownload");
@@ -1434,11 +1442,14 @@ namespace XboxDownload
                         sb.AppendLine(ip + " gs2.ww.prod.dl.playstation.net # XboxDownload");
                         sb.AppendLine(ip + " zeus.dl.playstation.net # XboxDownload");
                         sb.AppendLine(ip + " ares.dl.playstation.net # XboxDownload");
-                        sb.AppendLine(ip + " atum.hac.lp1.d4c.nintendo.net # XboxDownload");
-                        sb.AppendLine(ip + " bugyo.hac.lp1.eshop.nintendo.net # XboxDownload");
-                        sb.AppendLine(ip + " ctest-ul-lp1.cdn.nintendo.net # XboxDownload");
-                        sb.AppendLine(ip + " ctest-dl-lp1.cdn.nintendo.net # XboxDownload");
-                        sb.AppendLine("0.0.0.0 atum-eda.hac.lp1.d4c.nintendo.net # XboxDownload");
+                        if (host != "AkamaiV6")
+                        {
+                            sb.AppendLine(ip + " atum.hac.lp1.d4c.nintendo.net # XboxDownload");
+                            sb.AppendLine(ip + " bugyo.hac.lp1.eshop.nintendo.net # XboxDownload");
+                            sb.AppendLine(ip + " ctest-ul-lp1.cdn.nintendo.net # XboxDownload");
+                            sb.AppendLine(ip + " ctest-dl-lp1.cdn.nintendo.net # XboxDownload");
+                            sb.AppendLine("0.0.0.0 atum-eda.hac.lp1.d4c.nintendo.net # XboxDownload");
+                        }
                         sb.AppendLine(ip + " origin-a.akamaihd.net # XboxDownload");
                         sb.AppendLine("0.0.0.0 ssl-lvlt.cdn.ea.com # XboxDownload");
                         sb.AppendLine(ip + " blzddist1-a.akamaihd.net # XboxDownload");
@@ -1474,6 +1485,7 @@ namespace XboxDownload
             switch (host)
             {
                 case "Akamai":
+                case "AkamaiV6":
                     if (tsmi.Name == "tsmDNSmasp")
                     {
                         sb.AppendLine("# Xbox");
@@ -1500,13 +1512,16 @@ namespace XboxDownload
                         sb.AppendLine("address=/zeus.dl.playstation.net/" + ip);
                         sb.AppendLine("address=/ares.dl.playstation.net/" + ip);
                         sb.AppendLine();
-                        sb.AppendLine("# NS");
-                        sb.AppendLine("address=/atum.hac.lp1.d4c.nintendo.net/" + ip);
-                        sb.AppendLine("address=/bugyo.hac.lp1.eshop.nintendo.net/" + ip);
-                        sb.AppendLine("address=/ctest-ul-lp1.cdn.nintendo.net/" + ip);
-                        sb.AppendLine("address=/ctest-dl-lp1.cdn.nintendo.net/" + ip);
-                        sb.AppendLine("address=/atum-eda.hac.lp1.d4c.nintendo.net/0.0.0.0");
-                        sb.AppendLine();
+                        if (host != "AkamaiV6")
+                        {
+                            sb.AppendLine("# NS");
+                            sb.AppendLine("address=/atum.hac.lp1.d4c.nintendo.net/" + ip);
+                            sb.AppendLine("address=/bugyo.hac.lp1.eshop.nintendo.net/" + ip);
+                            sb.AppendLine("address=/ctest-ul-lp1.cdn.nintendo.net/" + ip);
+                            sb.AppendLine("address=/ctest-dl-lp1.cdn.nintendo.net/" + ip);
+                            sb.AppendLine("address=/atum-eda.hac.lp1.d4c.nintendo.net/0.0.0.0");
+                            sb.AppendLine();
+                        }
                         sb.AppendLine("# EA");
                         sb.AppendLine("address=/origin-a.akamaihd.net/" + ip);
                         sb.AppendLine("address=/ssl-lvlt.cdn.ea.com/0.0.0.0");
@@ -1540,13 +1555,16 @@ namespace XboxDownload
                         sb.AppendLine(ip + " zeus.dl.playstation.net");
                         sb.AppendLine(ip + " ares.dl.playstation.net");
                         sb.AppendLine();
-                        sb.AppendLine("# NS");
-                        sb.AppendLine(ip + " atum.hac.lp1.d4c.nintendo.net");
-                        sb.AppendLine(ip + " bugyo.hac.lp1.eshop.nintendo.net");
-                        sb.AppendLine(ip + " ctest-ul-lp1.cdn.nintendo.net");
-                        sb.AppendLine(ip + " ctest-dl-lp1.cdn.nintendo.net");
-                        sb.AppendLine("0.0.0.0 atum-eda.hac.lp1.d4c.nintendo.net");
-                        sb.AppendLine();
+                        if (host != "AkamaiV6")
+                        {
+                            sb.AppendLine("# NS");
+                            sb.AppendLine(ip + " atum.hac.lp1.d4c.nintendo.net");
+                            sb.AppendLine(ip + " bugyo.hac.lp1.eshop.nintendo.net");
+                            sb.AppendLine(ip + " ctest-ul-lp1.cdn.nintendo.net");
+                            sb.AppendLine(ip + " ctest-dl-lp1.cdn.nintendo.net");
+                            sb.AppendLine("0.0.0.0 atum-eda.hac.lp1.d4c.nintendo.net");
+                            sb.AppendLine();
+                        }
                         sb.AppendLine("# EA");
                         sb.AppendLine(ip + " origin-a.akamaihd.net");
                         sb.AppendLine("0.0.0.0 ssl-lvlt.cdn.ea.com");
@@ -1617,7 +1635,7 @@ namespace XboxDownload
                 {
                     sHosts = sw.ReadToEnd();
                 }
-                string newHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+.+\s+# XboxDownload\r\n", "");
+                string newHosts = Regex.Replace(sHosts, @"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|([\da-fA-F]{1,4}:){3}([\da-fA-F]{0,4}:)+[\da-fA-F]{1,4})\s+.+\s+# XboxDownload\r\n", "");
                 if (String.Equals(sHosts, newHosts))
                 {
                     MessageBox.Show("Hosts file was not written by any rules, no need to clear.", "Clear Hosts File", MessageBoxButtons.OK, MessageBoxIcon.None);
@@ -1625,7 +1643,7 @@ namespace XboxDownload
                 else
                 {
                     StringBuilder sb = new();
-                    Match result = Regex.Match(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+.+\s+# XboxDownload\r\n");
+                    Match result = Regex.Match(sHosts, @"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|([\da-fA-F]{1,4}:){3}([\da-fA-F]{0,4}:)+[\da-fA-F]{1,4})\s+.+\s+# XboxDownload\r\n");
                     while (result.Success)
                     {
                         sb.Append(result.Groups[0].Value);
@@ -3202,8 +3220,7 @@ namespace XboxDownload
                                         var json2 = JsonSerializer.Deserialize<XboxGameDownload.Game>(html, Form1.jsOptions);
                                         if (json2 != null && json2.PackageFound)
                                         {
-                                            packageFiles = json2.PackageFiles.Where(x => Regex.IsMatch(x.RelativeUrl, @"(\.msixvc|\.xvc)$", RegexOptions.IgnoreCase)).FirstOrDefault();
-                                            if (packageFiles == null) packageFiles = json2.PackageFiles.Where(x => !Regex.IsMatch(x.RelativeUrl, @"(\.xsp|\.phf)$", RegexOptions.IgnoreCase)).FirstOrDefault();
+                                            packageFiles = json2.PackageFiles.Where(x => Regex.IsMatch(x.RelativeUrl, @"(\.msixvc|\.xvc)$", RegexOptions.IgnoreCase)).FirstOrDefault() ?? json2.PackageFiles.Where(x => !Regex.IsMatch(x.RelativeUrl, @"(\.xsp|\.phf)$", RegexOptions.IgnoreCase)).FirstOrDefault();
                                         }
                                     }
                                     catch { }
