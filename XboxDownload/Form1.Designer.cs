@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
             toolStrip1 = new ToolStrip();
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             tsmUpdate = new ToolStripMenuItem();
@@ -45,7 +45,7 @@
             tsmAbout = new ToolStripMenuItem();
             tabControl1 = new TabControl();
             tabService = new TabPage();
-            groupBox11 = new GroupBox();
+            gbLog = new GroupBox();
             lvLog = new DoubleBufferListView();
             Col_Request = new ColumnHeader();
             Col_Content = new ColumnHeader();
@@ -289,10 +289,12 @@
             tsmAuthorization = new ToolStripMenuItem();
             tsmAuthorization1 = new ToolStripMenuItem();
             tsmAuthorization2 = new ToolStripMenuItem();
+            labelTraffic = new Label();
+            timer1 = new System.Windows.Forms.Timer(components);
             toolStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tabService.SuspendLayout();
-            groupBox11.SuspendLayout();
+            gbLog.SuspendLayout();
             panel1.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -412,19 +414,19 @@
             // 
             // tabService
             // 
-            tabService.Controls.Add(groupBox11);
+            tabService.Controls.Add(gbLog);
             tabService.Controls.Add(panel1);
             tabService.Controls.Add(groupBox1);
             resources.ApplyResources(tabService, "tabService");
             tabService.Name = "tabService";
             tabService.UseVisualStyleBackColor = true;
             // 
-            // groupBox11
+            // gbLog
             // 
-            groupBox11.Controls.Add(lvLog);
-            resources.ApplyResources(groupBox11, "groupBox11");
-            groupBox11.Name = "groupBox11";
-            groupBox11.TabStop = false;
+            gbLog.Controls.Add(lvLog);
+            resources.ApplyResources(gbLog, "gbLog");
+            gbLog.Name = "gbLog";
+            gbLog.TabStop = false;
             // 
             // lvLog
             // 
@@ -455,6 +457,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(labelTraffic);
             panel1.Controls.Add(linkClearLog);
             panel1.Controls.Add(ckbRecordLog);
             panel1.Controls.Add(linkTestDns);
@@ -842,9 +845,9 @@
             // 
             // Col_TTL
             // 
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle1.Format = "N0";
-            Col_TTL.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle7.Format = "N0";
+            Col_TTL.DefaultCellStyle = dataGridViewCellStyle7;
             resources.ApplyResources(Col_TTL, "Col_TTL");
             Col_TTL.Name = "Col_TTL";
             Col_TTL.ReadOnly = true;
@@ -852,9 +855,9 @@
             // 
             // Col_RoundtripTime
             // 
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle2.Format = "N0";
-            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle8.Format = "N0";
+            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle8;
             resources.ApplyResources(Col_RoundtripTime, "Col_RoundtripTime");
             Col_RoundtripTime.Name = "Col_RoundtripTime";
             Col_RoundtripTime.ReadOnly = true;
@@ -862,9 +865,9 @@
             // 
             // Col_Speed
             // 
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle3.Format = "N2";
-            Col_Speed.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle9.Format = "N2";
+            Col_Speed.DefaultCellStyle = dataGridViewCellStyle9;
             resources.ApplyResources(Col_Speed, "Col_Speed");
             Col_Speed.Name = "Col_Speed";
             Col_Speed.ReadOnly = true;
@@ -2151,6 +2154,17 @@
             tsmAuthorization2.Tag = "9PP5G1F0C2B6";
             tsmAuthorization2.Click += TsmAuthorization_Click;
             // 
+            // labelTraffic
+            // 
+            resources.ApplyResources(labelTraffic, "labelTraffic");
+            labelTraffic.ForeColor = Color.Green;
+            labelTraffic.Name = "labelTraffic";
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1000;
+            timer1.Tick += Timer1_Tick;
+            // 
             // Form1
             // 
             resources.ApplyResources(this, "$this");
@@ -2166,7 +2180,7 @@
             toolStrip1.PerformLayout();
             tabControl1.ResumeLayout(false);
             tabService.ResumeLayout(false);
-            groupBox11.ResumeLayout(false);
+            gbLog.ResumeLayout(false);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             groupBox1.ResumeLayout(false);
@@ -2430,7 +2444,7 @@
         private LinkLabel linkRestartGamingServices;
         private Label label50;
         private LinkLabel linkReInstallGamingServices;
-        private GroupBox groupBox11;
+        private GroupBox gbLog;
         private ToolStripMenuItem tsmAllUrl;
         private ToolStripMenuItem tsmSpeedTestLog;
         private ToolStripMenuItem tsmAuthorization;
@@ -2478,5 +2492,7 @@
         private DataGridViewTextBoxColumn Col_TTL;
         private DataGridViewTextBoxColumn Col_RoundtripTime;
         private DataGridViewTextBoxColumn Col_Speed;
+        private Label labelTraffic;
+        private System.Windows.Forms.Timer timer1;
     }
 }

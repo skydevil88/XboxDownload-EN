@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace XboxDownload
@@ -144,30 +145,20 @@ namespace XboxDownload
             {
                 return "0000:0000:0000:0000:0000:0000:0000:0000";
             }
-            if (ip.EndsWith("::"))
+            string[] arrs = ip.Split(':');
+            if (arrs.Length < 8)
             {
-                ip += "0";
+                ip = ip.Replace("::", string.Empty.PadLeft(10 - arrs.Length, ':'));
+                arrs = ip.Split(':');
             }
-            var arrs = ip.Split(':');
-            var symbol = "::";
-            var arrleng = arrs.Length;
-            while (arrleng < 8)
+            for (var i = 0; i < arrs.Length; i++)
             {
-                symbol += ":";
-                arrleng++;
-            }
-            ip = ip.Replace("::", symbol);
-            var fullip = "";
-            var arr = ip.Split(':');
-            for (var i = 0; i < arr.Length; i++)
-            {
-                if (arr[i].Length < 4)
+                if (arrs[i].Length < 4)
                 {
-                    arr[i] = arr[i].PadLeft(4, '0');
+                    arrs[i] = arrs[i].PadLeft(4, '0');
                 }
-                fullip += arr[i] + ':';
             }
-            return fullip[..^1].ToUpper();
+            return string.Join(':', arrs).ToUpper();
         }
     }
 }

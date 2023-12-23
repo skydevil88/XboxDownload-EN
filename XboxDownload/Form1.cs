@@ -68,7 +68,7 @@ namespace XboxDownload
             toolTip1.SetToolTip(this.labelEA, "EA games download domain name\norigin-a.akamaihd.net");
             toolTip1.SetToolTip(this.labelBattle, "Blzddist games download domain name\nblzddist1-a.akamaihd.net\nblzddist2-a.akamaihd.net\nblzddist3-a.akamaihd.net");
             toolTip1.SetToolTip(this.ckbDoH, Thread.CurrentThread.CurrentCulture.Name != "zh-CN" ? "Use Google DNS over HTTPS (8.8.8.8) to resolve domain name IP." : "Use Alidns DNS over HTTPS (223.5.5.5) to resolve domain name IP.");
-            toolTip1.SetToolTip(this.ckbSetDns, "Start listening, will set the computer DNS to the local IP and disable IPv6,\nRestore automatic settings after stop listening,\nconsole players no need to set.");
+            toolTip1.SetToolTip(this.ckbSetDns, "Start listening, will set the computer DNS to the local IP and disable IPv6 DNS,\nRestore automatic settings after stop listening,\nconsole players no need to set.");
 
             tbDnsIP.Text = Properties.Settings.Default.DnsIP;
             tbGameIP.Text = Properties.Settings.Default.GameIP;
@@ -112,7 +112,14 @@ namespace XboxDownload
                 foreach (UnicastIPAddressInformation ipadd in ipCollection)
                 {
                     if (ipadd.Address.AddressFamily == AddressFamily.InterNetwork)
-                        cbLocalIP.Items.Add(ipadd.Address.ToString());
+                    {
+                        ComboboxItem item = new()
+                        {
+                            Text = ipadd.Address.ToString(),
+                            Value = adapter
+                        };
+                        cbLocalIP.Items.Add(item);
+                    }
                 }
             }
             if (cbLocalIP.Items.Count >= 1)
@@ -233,6 +240,16 @@ namespace XboxDownload
             if (bAutoStartup)
             {
                 ButStart_Click(null, null);
+            }
+        }
+
+        private class ComboboxItem
+        {
+            public string? Text { get; set; }
+            public object? Value { get; set; }
+            public override string? ToString()
+            {
+                return Text;
             }
         }
 
@@ -395,6 +412,27 @@ namespace XboxDownload
         }
 
         #region Tab - Services
+        NetworkInterface? adapter = null;
+        private long OldUp { get; set; }
+        private long OldDown { get; set; }
+
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+            if (adapter != null)
+            {
+                long nowUp = adapter.GetIPStatistics().BytesSent;
+                long nowDown = adapter.GetIPStatistics().BytesReceived;
+                if (OldUp > 0 || OldDown > 0)
+                {
+                    long up = nowUp - OldUp;
+                    long down = nowDown - OldDown;
+                    labelTraffic.Text = String.Format("Traffic: ¡ü {0} ¡ý {1}", ClassMbr.ConvertBytes((ulong)up), ClassMbr.ConvertBytes((ulong)down));
+                }
+                OldUp = nowUp;
+                OldDown = nowDown;
+            }
+        }
+
         private void CkbNSBrowser_CheckedChanged(object sender, EventArgs e)
         {
             linkNSHomepage.Enabled = ckbNSBrowser.Checked;
@@ -1032,6 +1070,11 @@ namespace XboxDownload
         {
             Properties.Settings.Default.LocalIP = cbLocalIP.Text;
             Properties.Settings.Default.Save();
+
+            timer1.Stop();
+            adapter = (cbLocalIP.SelectedItem as ComboboxItem)?.Value as NetworkInterface;
+            OldUp = OldDown = 0;
+            timer1.Start();
         }
 
         private void LinkTestDns_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -1194,7 +1237,7 @@ namespace XboxDownload
             }
             if (rowIndex >= 1) dgvIpList.Rows[0].Cells[0].Selected = true;
         }
-        
+
         private async void CbImportIP_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbImportIP.SelectedIndex == 0) return;
@@ -1421,7 +1464,7 @@ namespace XboxDownload
                 {
                     case "Akamai":
                     case "AkamaiV6":
-                        sHosts = Regex.Replace(sHosts, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+[^\s]+(\.xboxlive\.com|\.xboxlive\.cn|\.delivery\.mp\.microsoft\.com|\.dl\.playstation\.net|\.nintendo\.net|\.cdn\.ea\.com|\.akamaihd\.net)\s+# XboxDownload\r\n", "");
+                        sHosts = Regex.Replace(sHosts, @"[^\s]+\s+[^\s]+(\.xboxlive\.com|\.xboxlive\.cn|\.delivery\.mp\.microsoft\.com|\.dl\.playstation\.net|\.nintendo\.net|\.cdn\.ea\.com|\.akamaihd\.net)\s+# XboxDownload\r\n", "");
                         sb.AppendLine(ip + " xvcf1.xboxlive.com # XboxDownload");
                         sb.AppendLine(ip + " xvcf2.xboxlive.com # XboxDownload");
                         sb.AppendLine(ip + " assets1.xboxlive.com # XboxDownload");
@@ -1635,7 +1678,7 @@ namespace XboxDownload
                 {
                     sHosts = sw.ReadToEnd();
                 }
-                string newHosts = Regex.Replace(sHosts, @"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|([\da-fA-F]{1,4}:){3}([\da-fA-F]{0,4}:)+[\da-fA-F]{1,4})\s+.+\s+# XboxDownload\r\n", "");
+                string newHosts = Regex.Replace(sHosts, @".+# XboxDownload\r\n", "");
                 if (String.Equals(sHosts, newHosts))
                 {
                     MessageBox.Show("Hosts file was not written by any rules, no need to clear.", "Clear Hosts File", MessageBoxButtons.OK, MessageBoxIcon.None);
@@ -1643,7 +1686,7 @@ namespace XboxDownload
                 else
                 {
                     StringBuilder sb = new();
-                    Match result = Regex.Match(sHosts, @"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|([\da-fA-F]{1,4}:){3}([\da-fA-F]{0,4}:)+[\da-fA-F]{1,4})\s+.+\s+# XboxDownload\r\n");
+                    Match result = Regex.Match(sHosts, @".+# XboxDownload\r\n");
                     while (result.Success)
                     {
                         sb.Append(result.Groups[0].Value);
@@ -1708,8 +1751,16 @@ namespace XboxDownload
                 butSpeedTest.Text = "Stop";
                 foreach (Control control in this.panelSpeedTest.Controls)
                 {
-                    if ((control is TextBox || control is CheckBox || control is Button || control is ComboBox || control is LinkLabel || control is FlowLayoutPanel) && control != butSpeedTest)
-                        control.Enabled = false;
+                    switch (control.Name)
+                    {
+                        case "linkHostsClear":
+                        case "linkHostsEdit":
+                        case "butSpeedTest":
+                            break;
+                        default:
+                            control.Enabled = false;
+                            break;
+                    }
                 }
                 Col_IP.SortMode = Col_Location.SortMode = Col_TTL.SortMode = Col_RoundtripTime.SortMode = Col_Speed.SortMode = DataGridViewColumnSortMode.NotSortable;
                 Col_Check.ReadOnly = true;
@@ -2249,7 +2300,7 @@ namespace XboxDownload
             tbFilePath.Text = string.Empty;
             tbContentId.Text = tbProductID.Text = tbBuildID.Text = tbFileTimeCreated.Text = tbDriveSize.Text = tbPackageVersion.Text = string.Empty;
             butAnalyze.Enabled = butOpenFile.Enabled = linkCopyContentID.Enabled = linkRename.Enabled = linkProductID.Visible = false;
-            Dictionary<string, string> headers = new() { { "Range", "0-4095" } };
+            Dictionary<string, string> headers = new() { { "Range", "bytes=0-4095" } };
             using HttpResponseMessage? response = await Task.Run(() => ClassWeb.HttpResponseMessage(url, "GET", null, null, headers));
             if (response != null && response.IsSuccessStatusCode)
             {

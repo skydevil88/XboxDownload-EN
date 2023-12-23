@@ -91,11 +91,11 @@ namespace XboxDownload
                         }
                         catch (Exception ex)
                         {
-                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Local Upload", ex.Message, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0xFF0000);
+                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Local Upload", ex.Message, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString(), 0xFF0000);
                         }
                         if (fs != null)
                         {
-                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Local Upload", _localPath, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
+                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Local Upload", _localPath, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString(), 0x008000);
                             using BinaryReader br = new(fs);
                             string _contentRange = string.Empty, _status = "200 OK";
                             long _fileLength = br.BaseStream.Length, _startPosition = 0;
@@ -237,7 +237,7 @@ namespace XboxDownload
                             sb.Append("Content-Length: 0\r\n\r\n");
                             Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
                             mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
-                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 302", _url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
+                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 302", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString(), 0x008000);
                         }
                         else
                         {
@@ -254,7 +254,7 @@ namespace XboxDownload
                                 sb.Append("Content-Length: 0\r\n\r\n");
                                 Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
                                 mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
-                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Download Link", _url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty, 0x008000);
+                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Download Link", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString(), 0x008000);
                             }
                             else if (_hosts == "www.msftconnecttest.com" && _tmpPath.ToLower() == "/connecttest.txt")
                             {
@@ -267,7 +267,7 @@ namespace XboxDownload
                                 Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
                                 mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
                                 mySocket.Send(_response, 0, _response.Length, SocketFlags.None, out _);
-                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty);
+                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString());
                             }
                             else if (_hosts == "ctest.cdn.nintendo.net" && _tmpPath.ToLower() == "/")
                             {
@@ -293,7 +293,7 @@ namespace XboxDownload
                                     Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
                                     mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
                                     mySocket.Send(_response, 0, _response.Length, SocketFlags.None, out _);
-                                    if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty);
+                                    if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString());
                                 }
                             }
                             if (!bFileFound)
@@ -306,7 +306,7 @@ namespace XboxDownload
                                 Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
                                 mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
                                 mySocket.Send(_response, 0, _response.Length, SocketFlags.None, out _);
-                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 404", _url, mySocket.RemoteEndPoint != null ? ((IPEndPoint)mySocket.RemoteEndPoint).Address.ToString() : string.Empty);
+                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 404", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString());
                             }
                         }
                     }

@@ -85,7 +85,7 @@ namespace XboxDownload
                 order++;
                 leng /= 1024;
             }
-            return String.Format("{0:#.00} {1}", leng, sizes[order]);
+            return String.Format(order > 0 ? "{0:#.00} {1}" : "{0} {1}", leng, sizes[order]);
         }
     }
 }
