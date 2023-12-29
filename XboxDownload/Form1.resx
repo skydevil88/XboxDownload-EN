@@ -568,6 +568,33 @@
   <data name="&gt;&gt;panel1.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="labelTraffic.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="labelTraffic.Location" type="System.Drawing.Point, System.Drawing">
+    <value>445, 9</value>
+  </data>
+  <data name="labelTraffic.Size" type="System.Drawing.Size, System.Drawing">
+    <value>229, 24</value>
+  </data>
+  <data name="labelTraffic.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="labelTraffic.Text" xml:space="preserve">
+    <value>Traffic: ↑ 0 Bytes ↓ 0 Bytes</value>
+  </data>
+  <data name="&gt;&gt;labelTraffic.Name" xml:space="preserve">
+    <value>labelTraffic</value>
+  </data>
+  <data name="&gt;&gt;labelTraffic.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;labelTraffic.Parent" xml:space="preserve">
+    <value>panel1</value>
+  </data>
+  <data name="&gt;&gt;labelTraffic.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="linkClearLog.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -3983,18 +4010,6 @@ When computer has multiple IPs, make sure the "Local IP" is on the same network 
   <data name="&gt;&gt;butCdnSave.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.Name" xml:space="preserve">
-    <value>ckbEnableCdnIP</value>
-  </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.Parent" xml:space="preserve">
-    <value>panel4</value>
-  </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
   <data name="panel4.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
   </data>
@@ -4084,39 +4099,6 @@ When computer has multiple IPs, make sure the "Local IP" is on the same network 
   </data>
   <data name="&gt;&gt;butCdnSave.ZOrder" xml:space="preserve">
     <value>1</value>
-  </data>
-  <data name="ckbEnableCdnIP.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="ckbEnableCdnIP.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="ckbEnableCdnIP.Location" type="System.Drawing.Point, System.Drawing">
-    <value>18, 16</value>
-  </data>
-  <data name="ckbEnableCdnIP.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
-  </data>
-  <data name="ckbEnableCdnIP.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 28</value>
-  </data>
-  <data name="ckbEnableCdnIP.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="ckbEnableCdnIP.Text" xml:space="preserve">
-    <value>Enable</value>
-  </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.Name" xml:space="preserve">
-    <value>ckbEnableCdnIP</value>
-  </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.Parent" xml:space="preserve">
-    <value>panel4</value>
-  </data>
-  <data name="&gt;&gt;ckbEnableCdnIP.ZOrder" xml:space="preserve">
-    <value>2</value>
   </data>
   <data name="&gt;&gt;label11.Name" xml:space="preserve">
     <value>label11</value>
@@ -9728,7 +9710,7 @@ does not match the one stored in the block map. (re-download)</value>
     <value>373, 34</value>
   </data>
   <data name="tsmUseAkamai.Text" xml:space="preserve">
-    <value>Use Akamai CDN Preferred IP</value>
+    <value>Use Akamai CDN IP</value>
   </data>
   <data name="tsmUseIPHosts.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -9856,34 +9838,7 @@ does not match the one stored in the block map. (re-download)</value>
   <data name="tsmAuthorization2.Text" xml:space="preserve">
     <value>Open Halo Infinite</value>
   </data>
-  <data name="labelTraffic.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="labelTraffic.Location" type="System.Drawing.Point, System.Drawing">
-    <value>445, 9</value>
-  </data>
-  <data name="labelTraffic.Size" type="System.Drawing.Size, System.Drawing">
-    <value>229, 24</value>
-  </data>
-  <data name="labelTraffic.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="labelTraffic.Text" xml:space="preserve">
-    <value>Traffic: ↑ 0 Bytes ↓ 0 Bytes</value>
-  </data>
-  <data name="&gt;&gt;labelTraffic.Name" xml:space="preserve">
-    <value>labelTraffic</value>
-  </data>
-  <data name="&gt;&gt;labelTraffic.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;labelTraffic.Parent" xml:space="preserve">
-    <value>panel1</value>
-  </data>
-  <data name="&gt;&gt;labelTraffic.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <metadata name="timer1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="timerTraffic.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>1131, 17</value>
   </metadata>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -11396,10 +11351,10 @@ does not match the one stored in the block map. (re-download)</value>
   <data name="&gt;&gt;tsmAuthorization2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;timer1.Name" xml:space="preserve">
-    <value>timer1</value>
+  <data name="&gt;&gt;timerTraffic.Name" xml:space="preserve">
+    <value>timerTraffic</value>
   </data>
-  <data name="&gt;&gt;timer1.Type" xml:space="preserve">
+  <data name="&gt;&gt;timerTraffic.Type" xml:space="preserve">
     <value>System.Windows.Forms.Timer, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

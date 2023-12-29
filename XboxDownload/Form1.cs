@@ -95,7 +95,6 @@ namespace XboxDownload
             ckbBattleStore.Checked = Properties.Settings.Default.BattleStore;
             ckbRecordLog.Checked = Properties.Settings.Default.RecordLog;
             tbCdnAkamai.Text = Properties.Settings.Default.IpsAkamai;
-            ckbEnableCdnIP.Checked = Properties.Settings.Default.EnableCdnIP;
 
             ckbRecordLog.CheckedChanged += new EventHandler(CkbRecordLog_CheckedChanged);
             ckbGameLink.CheckedChanged += new EventHandler(CkbGameLink_CheckedChanged);
@@ -297,9 +296,7 @@ namespace XboxDownload
         {
             if (e.Button == MouseButtons.Left)
             {
-                this.Show();
-                this.WindowState = FormWindowState.Normal;
-                this.Activate();
+                TsmiShow_Click(sender, EventArgs.Empty);
             }
         }
 
@@ -308,6 +305,8 @@ namespace XboxDownload
             this.Show();
             this.WindowState = FormWindowState.Normal;
             this.Activate();
+            OldUp = OldDown = 0;
+            timerTraffic.Start();
         }
 
         private void TsmiExit_Click(object sender, EventArgs e)
@@ -326,6 +325,8 @@ namespace XboxDownload
             {
                 bTips = false;
                 this.notifyIcon1.ShowBalloonTip(5, "Xbox Download", "Minimize to system tray", ToolTipIcon.Info);
+                OldUp = OldDown = 0;
+                timerTraffic.Stop();
             }
             e.Cancel = true;
         }
@@ -416,17 +417,17 @@ namespace XboxDownload
         private long OldUp { get; set; }
         private long OldDown { get; set; }
 
-        private void Timer1_Tick(object sender, EventArgs e)
+        private void TimerTraffic_Tick(object sender, EventArgs e)
         {
             if (adapter != null)
             {
-                long nowUp = adapter.GetIPStatistics().BytesSent;
-                long nowDown = adapter.GetIPStatistics().BytesReceived;
+                long nowUp = adapter.GetIPStatistics().BytesSent * 8;
+                long nowDown = adapter.GetIPStatistics().BytesReceived * 8;
                 if (OldUp > 0 || OldDown > 0)
                 {
                     long up = nowUp - OldUp;
                     long down = nowDown - OldDown;
-                    labelTraffic.Text = String.Format("Traffic: ¡ü {0} ¡ý {1}", ClassMbr.ConvertBytes((ulong)up), ClassMbr.ConvertBytes((ulong)down));
+                    labelTraffic.Text = String.Format("Traffic: ¡ü {0} ¡ý {1}", ClassMbr.ConvertBps((ulong)up), ClassMbr.ConvertBps((ulong)down));
                 }
                 OldUp = nowUp;
                 OldDown = nowDown;
@@ -1071,10 +1072,10 @@ namespace XboxDownload
             Properties.Settings.Default.LocalIP = cbLocalIP.Text;
             Properties.Settings.Default.Save();
 
-            timer1.Stop();
+            timerTraffic.Stop();
             adapter = (cbLocalIP.SelectedItem as ComboboxItem)?.Value as NetworkInterface;
             OldUp = OldDown = 0;
-            timer1.Start();
+            timerTraffic.Start();
         }
 
         private void LinkTestDns_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -1814,7 +1815,7 @@ namespace XboxDownload
             }
             if (uri != null)
             {
-                int range = 104857599;
+                int range = 52428799;
                 string userAgent = uri.Host.EndsWith(".nintendo.net") ? "XboxDownload (Nintendo NX)" : "XboxDownload";
                 Stopwatch sw = new();
 
@@ -1927,8 +1928,7 @@ namespace XboxDownload
                 butSpeedTest.Text = "Start";
                 foreach (Control control in this.panelSpeedTest.Controls)
                 {
-                    if (control is TextBox || control is CheckBox || control is Button || control is ComboBox || control is LinkLabel || control is FlowLayoutPanel)
-                        control.Enabled = true;
+                    control.Enabled = true;
                 }
                 Col_IP.SortMode = Col_Location.SortMode = Col_Speed.SortMode = Col_TTL.SortMode = Col_RoundtripTime.SortMode = DataGridViewColumnSortMode.Automatic;
                 Col_Check.ReadOnly = false;
@@ -2155,7 +2155,6 @@ namespace XboxDownload
                 File.WriteAllText(resourcePath + "\\" + "Akamai.txt", tbHosts2Akamai.Text.Trim() + "\r\n");
             }
             Properties.Settings.Default.IpsAkamai = tbCdnAkamai.Text;
-            Properties.Settings.Default.EnableCdnIP = ckbEnableCdnIP.Checked;
             Properties.Settings.Default.Save();
             DnsListen.UpdateHosts();
         }
@@ -2169,7 +2168,6 @@ namespace XboxDownload
                 tbHosts2Akamai.Text = sr.ReadToEnd().Trim() + "\r\n";
             }
             else tbHosts2Akamai.Clear();
-            ckbEnableCdnIP.Checked = Properties.Settings.Default.EnableCdnIP;
         }
         #endregion
 

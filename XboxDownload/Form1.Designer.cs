@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             toolStrip1 = new ToolStrip();
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             tsmUpdate = new ToolStripMenuItem();
@@ -52,6 +52,7 @@
             Col_ClientIP = new ColumnHeader();
             Col_Time = new ColumnHeader();
             panel1 = new Panel();
+            labelTraffic = new Label();
             linkClearLog = new LinkLabel();
             ckbRecordLog = new CheckBox();
             linkTestDns = new LinkLabel();
@@ -149,7 +150,6 @@
             panel4 = new Panel();
             butCdnReset = new Button();
             butCdnSave = new Button();
-            ckbEnableCdnIP = new CheckBox();
             groupBox3 = new GroupBox();
             label11 = new Label();
             linkCdnSpeedTest = new LinkLabel();
@@ -289,8 +289,7 @@
             tsmAuthorization = new ToolStripMenuItem();
             tsmAuthorization1 = new ToolStripMenuItem();
             tsmAuthorization2 = new ToolStripMenuItem();
-            labelTraffic = new Label();
-            timer1 = new System.Windows.Forms.Timer(components);
+            timerTraffic = new System.Windows.Forms.Timer(components);
             toolStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tabService.SuspendLayout();
@@ -465,6 +464,12 @@
             panel1.Controls.Add(label24);
             resources.ApplyResources(panel1, "panel1");
             panel1.Name = "panel1";
+            // 
+            // labelTraffic
+            // 
+            resources.ApplyResources(labelTraffic, "labelTraffic");
+            labelTraffic.ForeColor = Color.Green;
+            labelTraffic.Name = "labelTraffic";
             // 
             // linkClearLog
             // 
@@ -845,9 +850,9 @@
             // 
             // Col_TTL
             // 
-            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle7.Format = "N0";
-            Col_TTL.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle4.Format = "N0";
+            Col_TTL.DefaultCellStyle = dataGridViewCellStyle4;
             resources.ApplyResources(Col_TTL, "Col_TTL");
             Col_TTL.Name = "Col_TTL";
             Col_TTL.ReadOnly = true;
@@ -855,9 +860,9 @@
             // 
             // Col_RoundtripTime
             // 
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle8.Format = "N0";
-            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.Format = "N0";
+            Col_RoundtripTime.DefaultCellStyle = dataGridViewCellStyle5;
             resources.ApplyResources(Col_RoundtripTime, "Col_RoundtripTime");
             Col_RoundtripTime.Name = "Col_RoundtripTime";
             Col_RoundtripTime.ReadOnly = true;
@@ -865,9 +870,9 @@
             // 
             // Col_Speed
             // 
-            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle9.Format = "N2";
-            Col_Speed.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle6.Format = "N2";
+            Col_Speed.DefaultCellStyle = dataGridViewCellStyle6;
             resources.ApplyResources(Col_Speed, "Col_Speed");
             Col_Speed.Name = "Col_Speed";
             Col_Speed.ReadOnly = true;
@@ -1142,7 +1147,6 @@
             // 
             panel4.Controls.Add(butCdnReset);
             panel4.Controls.Add(butCdnSave);
-            panel4.Controls.Add(ckbEnableCdnIP);
             resources.ApplyResources(panel4, "panel4");
             panel4.Name = "panel4";
             // 
@@ -1159,12 +1163,6 @@
             butCdnSave.Name = "butCdnSave";
             butCdnSave.UseVisualStyleBackColor = true;
             butCdnSave.Click += ButCdnSave_Click;
-            // 
-            // ckbEnableCdnIP
-            // 
-            resources.ApplyResources(ckbEnableCdnIP, "ckbEnableCdnIP");
-            ckbEnableCdnIP.Name = "ckbEnableCdnIP";
-            ckbEnableCdnIP.UseVisualStyleBackColor = true;
             // 
             // groupBox3
             // 
@@ -2154,16 +2152,10 @@
             tsmAuthorization2.Tag = "9PP5G1F0C2B6";
             tsmAuthorization2.Click += TsmAuthorization_Click;
             // 
-            // labelTraffic
+            // timerTraffic
             // 
-            resources.ApplyResources(labelTraffic, "labelTraffic");
-            labelTraffic.ForeColor = Color.Green;
-            labelTraffic.Name = "labelTraffic";
-            // 
-            // timer1
-            // 
-            timer1.Interval = 1000;
-            timer1.Tick += Timer1_Tick;
+            timerTraffic.Interval = 1000;
+            timerTraffic.Tick += TimerTraffic_Tick;
             // 
             // Form1
             // 
@@ -2203,7 +2195,6 @@
             groupBox5.ResumeLayout(false);
             groupBox5.PerformLayout();
             panel4.ResumeLayout(false);
-            panel4.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
             tabHardDisk.ResumeLayout(false);
@@ -2357,7 +2348,6 @@
         private TextBox tbHosts2Akamai;
         private Button butCdnReset;
         private Button butCdnSave;
-        private CheckBox ckbEnableCdnIP;
         private TabPage tabHardDisk;
         private TabPage tabStore;
         private TabPage tabTools;
@@ -2493,6 +2483,6 @@
         private DataGridViewTextBoxColumn Col_RoundtripTime;
         private DataGridViewTextBoxColumn Col_Speed;
         private Label labelTraffic;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer timerTraffic;
     }
 }
