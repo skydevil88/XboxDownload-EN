@@ -421,13 +421,13 @@ namespace XboxDownload
         {
             if (adapter != null)
             {
-                long nowUp = adapter.GetIPStatistics().BytesSent * 8;
-                long nowDown = adapter.GetIPStatistics().BytesReceived * 8;
+                long nowUp = adapter.GetIPStatistics().BytesSent;
+                long nowDown = adapter.GetIPStatistics().BytesReceived;
                 if (OldUp > 0 || OldDown > 0)
                 {
                     long up = nowUp - OldUp;
                     long down = nowDown - OldDown;
-                    labelTraffic.Text = String.Format("Traffic: ¡ü {0} ¡ý {1}", ClassMbr.ConvertBps((ulong)up), ClassMbr.ConvertBps((ulong)down));
+                    labelTraffic.Text = String.Format("Traffic: ¡ü {0} ¡ý {1}", ClassMbr.ConvertBps(up), ClassMbr.ConvertBps(down));
                 }
                 OldUp = nowUp;
                 OldDown = nowDown;
@@ -1877,7 +1877,7 @@ namespace XboxDownload
                         }
                     }
                     dgvr.Tag += string.IsNullOrEmpty(socketPackage.Err) ? socketPackage.Headers : socketPackage.Err;
-                    if (socketPackage.Headers.StartsWith("HTTP/1.1 206"))
+                    if (socketPackage.Headers.StartsWith("HTTP/1.1 206") && socketPackage.Buffer != null)
                     {
                         double speed = Math.Round((double)(socketPackage.Buffer.Length) / sw.ElapsedMilliseconds * 1000 / 1024 / 1024, 2, MidpointRounding.AwayFromZero);
                         dgvr.Cells["Col_Speed"].Value = speed;
@@ -1888,6 +1888,7 @@ namespace XboxDownload
                         dgvr.Cells["Col_Speed"].Value = (double)0;
                         dgvr.Cells["Col_Speed"].Style.ForeColor = Color.Red;
                     }
+                    socketPackage.Buffer = null;
                 }
             }
             else
