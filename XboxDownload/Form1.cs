@@ -78,7 +78,6 @@ namespace XboxDownload
             tbNSIP.Text = Properties.Settings.Default.NSIP;
             ckbNSBrowser.Checked = Properties.Settings.Default.NSBrowser;
             tbEAIP.Text = Properties.Settings.Default.EAIP;
-            ckbEACDN.Checked = Properties.Settings.Default.EACDN;
             tbBattleIP.Text = Properties.Settings.Default.BattleIP;
             ckbBattleCDN.Checked = Properties.Settings.Default.BattleCDN;
             ckbLocalUpload.Checked = Properties.Settings.Default.LocalUpload;
@@ -427,7 +426,7 @@ namespace XboxDownload
                 {
                     long up = nowUp - OldUp;
                     long down = nowDown - OldDown;
-                    labelTraffic.Text = String.Format("Traffic: ¡ü {0} ¡ý {1}", ClassMbr.ConvertBps(up), ClassMbr.ConvertBps(down));
+                    labelTraffic.Text = String.Format("Traffic: ¡ü {0} ¡ý {1}", ClassMbr.ConvertBps(up * 8), ClassMbr.ConvertBps(down * 8));
                 }
                 OldUp = nowUp;
                 OldDown = nowDown;
@@ -509,7 +508,7 @@ namespace XboxDownload
                 butStart.Enabled = false;
                 bServiceFlag = false;
                 UpdateHosts(false);
-                if (Properties.Settings.Default.SetDns) ClassDNS.SetDns(null);
+                if (Properties.Settings.Default.SetDns) ClassDNS.SetDns();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.DnsIP)) tbDnsIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.GameIP)) tbGameIP.Clear();
                 if (string.IsNullOrEmpty(Properties.Settings.Default.AppIP)) tbAppIP.Clear();
@@ -662,7 +661,6 @@ namespace XboxDownload
                 Properties.Settings.Default.NSIP = nsIP;
                 Properties.Settings.Default.NSBrowser = ckbNSBrowser.Checked;
                 Properties.Settings.Default.EAIP = eaIP;
-                Properties.Settings.Default.EACDN = ckbEACDN.Checked;
                 Properties.Settings.Default.BattleIP = battleIP;
                 Properties.Settings.Default.BattleCDN = ckbBattleCDN.Checked;
                 Properties.Settings.Default.LocalUpload = ckbLocalUpload.Checked;
@@ -945,15 +943,11 @@ namespace XboxDownload
                     }
                     if (Properties.Settings.Default.EAStore)
                     {
-                        if (Properties.Settings.Default.EACDN)
-                        {
-                            sb.AppendLine(Properties.Settings.Default.LocalIP + " api1.origin.com");
-                            sb.AppendLine("0.0.0.0 ssl-lvlt.cdn.ea.com");
-                        }
                         if (!string.IsNullOrEmpty(Properties.Settings.Default.EAIP))
                         {
                             sb.AppendLine(Properties.Settings.Default.EAIP + " origin-a.akamaihd.net");
                         }
+                        sb.AppendLine("0.0.0.0 ssl-lvlt.cdn.ea.com");
                     }
                     if (Properties.Settings.Default.BattleStore)
                     {
@@ -3254,7 +3248,7 @@ namespace XboxDownload
                     string hosts = "packagespc.xboxlive.com", url = String.Empty;
                     ulong filesize = 0;
                     string? ip = ClassDNS.DoH(hosts);
-                    if (!string.IsNullOrEmpty(ip)) return;
+                    if (string.IsNullOrEmpty(ip)) return;
                     using (HttpResponseMessage? response = ClassWeb.HttpResponseMessage("https://" + ip + "/GetBasePackage/" + contentId, "GET", null, null, new() { { "Host", hosts }, { "Authorization", Properties.Settings.Default.Authorization } }))
                     {
                         if (response != null)
