@@ -243,58 +243,66 @@ namespace XboxDownload
                         {
                             bool bFileFound = false;
                             string _url = "http://" + _hosts + _filePath;
-                            if (_hosts == "tlu.dl.delivery.mp.microsoft.com")
+                            switch (_hosts)
                             {
-                                bFileFound = true;
-                                string _tmp = "http://2.tlu.dl.delivery.mp.microsoft.com" + _filePath;
-                                StringBuilder sb = new();
-                                sb.Append("HTTP/1.1 302 Moved Temporarily\r\n");
-                                sb.Append("Content-Type: text/html\r\n");
-                                sb.Append("Location: " + _tmp + "\r\n");
-                                sb.Append("Content-Length: 0\r\n\r\n");
-                                Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
-                                mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
-                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Download Link", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString(), 0x008000);
-                            }
-                            else if (_hosts == "www.msftconnecttest.com" && _tmpPath.ToLower() == "/connecttest.txt")
-                            {
-                                bFileFound = true;
-                                Byte[] _response = Encoding.ASCII.GetBytes("Microsoft Connect Test");
-                                StringBuilder sb = new();
-                                sb.Append("HTTP/1.1 200 OK\r\n");
-                                sb.Append("Content-Type: text/plain\r\n");
-                                sb.Append("Content-Length: " + _response.Length + "\r\n\r\n");
-                                Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
-                                mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
-                                mySocket.Send(_response, 0, _response.Length, SocketFlags.None, out _);
-                                if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString());
-                            }
-                            else if (_hosts == "ctest.cdn.nintendo.net" && _tmpPath.ToLower() == "/")
-                            {
-                                bFileFound = true;
-                                if (Properties.Settings.Default.NSBrowser)
-                                {
-                                    StringBuilder sb = new();
-                                    sb.Append("HTTP/1.1 302 Moved Temporarily\r\n");
-                                    sb.Append("Content-Type: text/html\r\n");
-                                    sb.Append("Location: " + Properties.Settings.Default.NSHomepage + "\r\n");
-                                    sb.Append("Content-Length: 0\r\n\r\n");
-                                    Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
-                                    mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
-                                }
-                                else
-                                {
-                                    Byte[] _response = Encoding.ASCII.GetBytes("ok");
-                                    StringBuilder sb = new();
-                                    sb.Append("HTTP/1.1 200 OK\r\n");
-                                    sb.Append("Content-Type: text/plain\r\n");
-                                    sb.Append("X-Organization: Nintendo\r\n");
-                                    sb.Append("Content-Length: " + _response.Length + "\r\n\r\n");
-                                    Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
-                                    mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
-                                    mySocket.Send(_response, 0, _response.Length, SocketFlags.None, out _);
-                                    if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString());
-                                }
+                                case "tlu.dl.delivery.mp.microsoft.com":
+                                    {
+                                        bFileFound = true;
+                                        string _tmp = "http://2.tlu.dl.delivery.mp.microsoft.com" + _filePath;
+                                        StringBuilder sb = new();
+                                        sb.Append("HTTP/1.1 302 Moved Temporarily\r\n");
+                                        sb.Append("Content-Type: text/html\r\n");
+                                        sb.Append("Location: " + _tmp + "\r\n");
+                                        sb.Append("Content-Length: 0\r\n\r\n");
+                                        Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
+                                        mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("Download Link", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString(), 0x008000);
+                                    }
+                                    break;
+                                case "www.msftconnecttest.com":
+                                    if (_tmpPath.ToLower() == "/connecttest.txt")
+                                    {
+                                        bFileFound = true;
+                                        Byte[] _response = Encoding.ASCII.GetBytes("Microsoft Connect Test");
+                                        StringBuilder sb = new();
+                                        sb.Append("HTTP/1.1 200 OK\r\n");
+                                        sb.Append("Content-Type: text/plain\r\n");
+                                        sb.Append("Content-Length: " + _response.Length + "\r\n\r\n");
+                                        Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
+                                        mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
+                                        mySocket.Send(_response, 0, _response.Length, SocketFlags.None, out _);
+                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString());
+                                    }
+                                    break;
+                                case "ctest.cdn.nintendo.net":
+                                    if (_tmpPath.ToLower() == "/")
+                                    {
+                                        bFileFound = true;
+                                        if (Properties.Settings.Default.NSBrowser)
+                                        {
+                                            StringBuilder sb = new();
+                                            sb.Append("HTTP/1.1 302 Moved Temporarily\r\n");
+                                            sb.Append("Content-Type: text/html\r\n");
+                                            sb.Append("Location: " + Properties.Settings.Default.NSHomepage + "\r\n");
+                                            sb.Append("Content-Length: 0\r\n\r\n");
+                                            Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
+                                            mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
+                                        }
+                                        else
+                                        {
+                                            Byte[] _response = Encoding.ASCII.GetBytes("ok");
+                                            StringBuilder sb = new();
+                                            sb.Append("HTTP/1.1 200 OK\r\n");
+                                            sb.Append("Content-Type: text/plain\r\n");
+                                            sb.Append("X-Organization: Nintendo\r\n");
+                                            sb.Append("Content-Length: " + _response.Length + "\r\n\r\n");
+                                            Byte[] _headers = Encoding.ASCII.GetBytes(sb.ToString());
+                                            mySocket.Send(_headers, 0, _headers.Length, SocketFlags.None, out _);
+                                            mySocket.Send(_response, 0, _response.Length, SocketFlags.None, out _);
+                                            if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("HTTP 200", _url, ((IPEndPoint)mySocket.RemoteEndPoint!).Address.ToString());
+                                        }
+                                    }
+                                    break;
                             }
                             if (!bFileFound)
                             {
@@ -341,7 +349,7 @@ namespace XboxDownload
             if (result.Success)
             {
                 string key = result.Groups["ContentId"].Value.ToLower();
-                if (Regex.IsMatch(_filePath, @"_xs\.xvc$", RegexOptions.IgnoreCase))
+                if (Regex.IsMatch(_filePath, @"_xs(-\d+)?\.xvc$", RegexOptions.IgnoreCase))
                     key += "_xs";
                 else if (!Regex.IsMatch(_filePath, @"\.msixvc$", RegexOptions.IgnoreCase))
                     key += "_x";

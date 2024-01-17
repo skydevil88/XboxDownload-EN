@@ -103,6 +103,7 @@ namespace XboxDownload
             tbIpLocation.Text = Properties.Settings.Default.IpLocation;
 
             NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up && x.NetworkInterfaceType != NetworkInterfaceType.Loopback && (x.NetworkInterfaceType == NetworkInterfaceType.Ethernet || x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && !x.Description.Contains("Virtual", StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (adapters.Length == 0) adapters = NetworkInterface.GetAllNetworkInterfaces().Where(x => x.OperationalStatus == OperationalStatus.Up && x.NetworkInterfaceType != NetworkInterfaceType.Loopback).ToArray();
             foreach (NetworkInterface adapter in adapters)
             {
                 IPInterfaceProperties adapterProperties = adapter.GetIPProperties();
@@ -877,7 +878,7 @@ namespace XboxDownload
                 {
                     sHosts = sw.ReadToEnd();
                 }
-                sHosts = Regex.Replace(sHosts, @"# Added by XboxDownload\r\n(.*\r\n)+# End of XboxDownload\r\n", "");
+                sHosts = Regex.Replace(sHosts, @"# Added by XboxDownload\r\n(.*\r\n)*# End of XboxDownload\r\n", "");
                 if (add)
                 {
                     sb.AppendLine("# Added by XboxDownload");
