@@ -850,6 +850,7 @@ namespace XboxDownload
                 }
                 Program.SystemSleep.PreventForCurrentThread(false);
             }
+            DnsListen.ClearDnsCache();
             butStart.Enabled = true;
         }
 
@@ -861,17 +862,12 @@ namespace XboxDownload
             string sHostsPath = Environment.SystemDirectory + "\\drivers\\etc\\hosts";
             try
             {
-                FileInfo fi = new(sHostsPath);
-                if (!fi.Exists)
-                {
-                    StreamWriter sw = fi.CreateText();
-                    sw.Close();
-                    fi.Refresh();
-                }
                 string sHosts;
-                using (StreamReader sw = new(sHostsPath))
+                FileInfo fi = new(Environment.SystemDirectory + "\\drivers\\etc\\hosts");
+                using (FileStream fs = fi.Open(FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    sHosts = sw.ReadToEnd();
+                    using StreamReader sr = new(fs);
+                    sHosts = sr.ReadToEnd();
                 }
                 if (!(Properties.Settings.Default.SetDns && string.IsNullOrEmpty(Regex.Replace(sHosts, "#.*", "").Trim())))
                 {
@@ -984,9 +980,13 @@ namespace XboxDownload
                     fi.SetAccessControl(fSecurity);
                     if ((fi.Attributes & FileAttributes.ReadOnly) != 0)
                         fi.Attributes = FileAttributes.Normal;
-                    using (StreamWriter sw = new(sHostsPath, false))
+                    using (FileStream fs = fi.Open(FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                     {
-                        sw.Write(sHosts.Trim() + "\r\n");
+                        if (!string.IsNullOrEmpty(sHosts.Trim()))
+                        {
+                            using StreamWriter sw = new(fs);
+                            sw.WriteLine(sHosts.Trim());
+                        }
                     }
                     fSecurity.RemoveAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
                     fi.SetAccessControl(fSecurity);
@@ -1438,25 +1438,14 @@ namespace XboxDownload
             string? host = dgvIpList.Tag.ToString();
             string? ip = dgvr.Cells["Col_IP"].Value.ToString();
 
-            string sHostsPath = Environment.SystemDirectory + "\\drivers\\etc\\hosts";
             try
             {
-                FileInfo fi = new(sHostsPath);
-                if (!fi.Exists)
+                string sHosts;
+                FileInfo fi = new(Environment.SystemDirectory + "\\drivers\\etc\\hosts");
+                using (FileStream fs = fi.Open(FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    StreamWriter sw = fi.CreateText();
-                    sw.Close();
-                    fi.Refresh();
-                }
-                FileSecurity fSecurity = fi.GetAccessControl();
-                fSecurity.AddAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
-                fi.SetAccessControl(fSecurity);
-                if ((fi.Attributes & FileAttributes.ReadOnly) != 0)
-                    fi.Attributes = FileAttributes.Normal;
-                string sHosts = string.Empty;
-                using (StreamReader sw = new(sHostsPath))
-                {
-                    sHosts = sw.ReadToEnd();
+                    using StreamReader sr = new(fs);
+                    sHosts = sr.ReadToEnd();
                 }
                 StringBuilder sb = new();
                 switch (host)
@@ -1501,9 +1490,19 @@ namespace XboxDownload
                         sb.AppendLine(ip + " " + host + " # XboxDownload");
                         break;
                 }
-                using (StreamWriter sw = new(sHostsPath, false))
+                sHosts = sHosts.Trim() + "\r\n" + sb.ToString();
+                FileSecurity fSecurity = fi.GetAccessControl();
+                fSecurity.AddAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
+                fi.SetAccessControl(fSecurity);
+                if ((fi.Attributes & FileAttributes.ReadOnly) != 0)
+                    fi.Attributes = FileAttributes.Normal;
+                using (FileStream fs = fi.Open(FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    sw.Write(sHosts.Trim() + "\r\n" + sb.ToString());
+                    if (!string.IsNullOrEmpty(sHosts.Trim()))
+                    {
+                        using StreamWriter sw = new(fs);
+                        sw.WriteLine(sHosts.Trim());
+                    }
                 }
                 fSecurity.RemoveAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
                 fi.SetAccessControl(fSecurity);
@@ -1657,25 +1656,14 @@ namespace XboxDownload
 
         private void LinkHostsClear_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            string sHostsPath = Environment.SystemDirectory + "\\drivers\\etc\\hosts";
             try
             {
-                FileInfo fi = new(sHostsPath);
-                if (!fi.Exists)
+                string sHosts;
+                FileInfo fi = new(Environment.SystemDirectory + "\\drivers\\etc\\hosts");
+                using (FileStream fs = fi.Open(FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    StreamWriter sw = fi.CreateText();
-                    sw.Close();
-                    fi.Refresh();
-                }
-                FileSecurity fSecurity = fi.GetAccessControl();
-                fSecurity.AddAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
-                fi.SetAccessControl(fSecurity);
-                if ((fi.Attributes & FileAttributes.ReadOnly) != 0)
-                    fi.Attributes = FileAttributes.Normal;
-                string sHosts = string.Empty;
-                using (StreamReader sw = new(sHostsPath))
-                {
-                    sHosts = sw.ReadToEnd();
+                    using StreamReader sr = new(fs);
+                    sHosts = sr.ReadToEnd();
                 }
                 string newHosts = Regex.Replace(sHosts, @".+# XboxDownload\r\n", "");
                 if (String.Equals(sHosts, newHosts))
@@ -1693,12 +1681,23 @@ namespace XboxDownload
                     }
                     if (MessageBox.Show("Do you comfirm to clear below written rules?\n\n" + sb.ToString(), "Clear Hosts File", MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                     {
-                        using StreamWriter sw = new(sHostsPath, false);
-                        sw.Write(newHosts.Trim() + "\r\n");
+                        FileSecurity fSecurity = fi.GetAccessControl();
+                        fSecurity.AddAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
+                        fi.SetAccessControl(fSecurity);
+                        if ((fi.Attributes & FileAttributes.ReadOnly) != 0)
+                            fi.Attributes = FileAttributes.Normal;
+                        using (FileStream fs = fi.Open(FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+                        {
+                            if (!string.IsNullOrEmpty(newHosts.Trim()))
+                            {
+                                using StreamWriter sw = new(fs);
+                                sw.WriteLine(newHosts.Trim());
+                            }
+                        }
+                        fSecurity.RemoveAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
+                        fi.SetAccessControl(fSecurity);
                     }
                 }
-                fSecurity.RemoveAccessRule(new FileSystemAccessRule("Administrators", FileSystemRights.FullControl, AccessControlType.Allow));
-                fi.SetAccessControl(fSecurity);
             }
             catch (Exception ex)
             {
@@ -2007,7 +2006,11 @@ namespace XboxDownload
             }
             dgvHosts.ClearSelection();
             DnsListen.UpdateHosts();
-            if (bServiceFlag) UpdateHosts(true);
+            if (bServiceFlag)
+            {
+                UpdateHosts(true);
+                DnsListen.ClearDnsCache();
+            }
         }
 
         private void ButHostReset_Click(object sender, EventArgs e)
@@ -2156,6 +2159,7 @@ namespace XboxDownload
             Properties.Settings.Default.IpsAkamai = tbCdnAkamai.Text;
             Properties.Settings.Default.Save();
             DnsListen.UpdateHosts();
+            if (bServiceFlag) DnsListen.ClearDnsCache();
         }
 
         private void ButCdnReset_Click(object sender, EventArgs e)

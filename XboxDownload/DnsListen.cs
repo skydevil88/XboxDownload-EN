@@ -15,7 +15,7 @@ namespace XboxDownload
         Socket? socket = null;
         public static string dohServer = string.Empty;
         private readonly Form1 parentForm;
-        private readonly Regex reDoHBlacklist = new("google|youtube|facebook|twitter");
+        private readonly Regex reDoHFilter = new("google|youtube|facebook|twitter");
         public static Regex reHosts = new(@"^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$");
         public static ConcurrentDictionary<String, List<ResouceRecord>> dicService = new(), dicHosts1 = new();
         public static ConcurrentDictionary<Regex, List<ResouceRecord>> dicHosts2 = new();
@@ -355,7 +355,7 @@ namespace XboxDownload
                                         if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", lsHostsIp2.Select(a => new IPAddress(a.Datas ?? Array.Empty<byte>()).ToString()).ToArray()), ((IPEndPoint)client).Address.ToString(), 0x0000FF);
                                         return;
                                     }
-                                    if (Properties.Settings.Default.DoH && !reDoHBlacklist.IsMatch(queryName))
+                                    if (Properties.Settings.Default.DoH && !reDoHFilter.IsMatch(queryName))
                                     {
                                         string html = ClassWeb.HttpResponseContent(dohServer + "/resolve?name=" + ClassWeb.UrlEncode(queryName) + "&type=A", "GET", null, null, null, 6000);
                                         if (Regex.IsMatch(html.Trim(), @"^{.+}$"))
@@ -366,17 +366,17 @@ namespace XboxDownload
                                                 json = JsonSerializer.Deserialize<ClassDNS.Api>(html, Form1.jsOptions);
                                             }
                                             catch { }
-                                            if (json != null && json.Answer != null)
+                                            if (json != null)
                                             {
-                                                if (json.Status == 0)
+                                                dns.QR = 1;
+                                                dns.RA = 1;
+                                                dns.RD = 1;
+                                                dns.ResouceRecords = new List<ResouceRecord>();
+                                                if (json.Status == 0 && json.Answer != null)
                                                 {
-                                                    dns.QR = 1;
-                                                    dns.RA = 1;
-                                                    dns.RD = 1;
-                                                    dns.ResouceRecords = new List<ResouceRecord>();
                                                     foreach (var answer in json.Answer)
                                                     {
-                                                        if (answer.Type == 1 && IPAddress.TryParse(answer.Data, out IPAddress? ipAddress))
+                                                        if (answer.Type == 1 && IPAddress.TryParse(answer.Data, out IPAddress? ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
                                                         {
                                                             dns.ResouceRecords.Add(new ResouceRecord
                                                             {
@@ -387,14 +387,10 @@ namespace XboxDownload
                                                             });
                                                         }
                                                     }
-                                                    socket?.SendTo(dns.ToBytes(), client);
-                                                    var arrIp = json.Answer.Where(x => x.Type == 1).Select(x => x.Data);
-                                                    if (arrIp != null)
-                                                    {
-                                                        if (Properties.Settings.Default.RecordLog) parentForm.SaveLog("DNS Query", queryName + " -> " + string.Join(", ", arrIp.ToArray()), ((IPEndPoint)client).Address.ToString());
-                                                    }
-                                                    return;
                                                 }
+                                                socket?.SendTo(dns.ToBytes(), client);
+                                                if (Properties.Settings.Default.RecordLog && dns.ResouceRecords.Count >= 1) parentForm.SaveLog("DNSv4 查询", queryName + " -> " + string.Join(", ", json.Answer!.Where(x => x.Type == 1).Select(x => x.Data)), ((IPEndPoint)client).Address.ToString());
+                                                return;
                                             }
                                         }
                                     }
@@ -552,6 +548,20 @@ namespace XboxDownload
                     }
                 }
             }
+        }
+
+        public static void ClearDnsCache()
+        {
+            using Process p = new();
+            p.StartInfo.FileName = "cmd.exe";
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.CreateNoWindow = true;
+            p.Start();
+
+            p.StandardInput.WriteLine("ipconfig /flushdns");
+            p.StandardInput.WriteLine("exit");
+            p.StandardInput.Close();
         }
     }
 

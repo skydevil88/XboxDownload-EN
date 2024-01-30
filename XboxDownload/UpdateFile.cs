@@ -10,7 +10,7 @@ namespace XboxDownload
         public const string homePage = "https://xbox.skydevil.xyz";
         public const string project = "https://github.com/skydevil88/XboxDownload-EN";
         private static readonly string[,] proxys = {
-            { "proxy", "https://py.skydevil.xyz/"},
+            { "proxy", "https://py2.skydevil.xyz/"},
             { "direct", "" }
         };
 
@@ -66,7 +66,7 @@ namespace XboxDownload
                         return;
                     }
                     string download = releases.Replace("tag", "download") + "/XboxDownload.zip";
-                    using (HttpResponseMessage? response = ClassWeb.HttpResponseMessage(download, "GET", null, null, null, 60000, "XboxDownload"))
+                    using (HttpResponseMessage? response = ClassWeb.HttpResponseMessage(download, "GET", null, null, null, 6000, "XboxDownload"))
                     {
                         if (response != null && response.IsSuccessStatusCode)
                         {
@@ -116,6 +116,7 @@ namespace XboxDownload
                         if (!autoupdate) MessageBox.Show("Error on downloading file. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         parentForm.tsmUpdate.Enabled = true;
                     }));
+                    return;
                 }
             }
             if (!autoupdate)
@@ -153,7 +154,7 @@ namespace XboxDownload
             await Task.WhenAny(tasks);
             if (!string.IsNullOrEmpty(fileUrl))
             {
-                using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(fileUrl, "GET", null, null, null, 60000, "XboxDownload");
+                using HttpResponseMessage? response = ClassWeb.HttpResponseMessage(fileUrl, "GET", null, null, null, 6000, "XboxDownload");
                 if (response != null && response.IsSuccessStatusCode)
                 {
                     byte[] buffer = response.Content.ReadAsByteArrayAsync().Result;
