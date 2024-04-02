@@ -36,9 +36,3 @@ Tools
 ---
 ![Hosts](doc/Tools.png)
 
-### Support the project
-
-|  | Address  |
-| --- | --- |
-|**BTC** | `bc1p3ledqqnj582acr9q8md53d79frumnzkdldcax76ac0apyg0vyw3s2tjwm6`|
-|**ETH** | `0x3702c8f2d2d73c073ed294b180646b265b05c5c2` |

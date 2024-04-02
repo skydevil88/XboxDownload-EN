@@ -407,7 +407,7 @@ namespace XboxDownload
                         }
                         try
                         {
-                            var proxy = new UdpClient();
+                            using UdpClient proxy = new();
                             proxy.Client.ReceiveTimeout = 6000;
                             proxy.Connect(iPEndPoint);
                             proxy.Send(buff, read);

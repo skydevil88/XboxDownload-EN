@@ -565,6 +565,7 @@ namespace XboxDownload
                     {
                         MessageBox.Show("Incorrect DNS server IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbDnsIP.Focus();
+                        tbDnsIP.SelectAll();
                         return;
                     }
                 }
@@ -579,6 +580,7 @@ namespace XboxDownload
                     {
                         MessageBox.Show("Incorrect Xbox games download IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbGameIP.Focus();
+                        tbGameIP.SelectAll();
                         return;
                     }
                 }
@@ -593,6 +595,7 @@ namespace XboxDownload
                     {
                         MessageBox.Show("Incorrect Xbox apps download IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbAppIP.Focus();
+                        tbAppIP.SelectAll();
                         return;
                     }
                 }
@@ -607,6 +610,7 @@ namespace XboxDownload
                     {
                         MessageBox.Show("Incorrect PS games download IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbPSIP.Focus();
+                        tbPSIP.SelectAll();
                         return;
                     }
                 }
@@ -621,6 +625,7 @@ namespace XboxDownload
                     {
                         MessageBox.Show("Incorrect NS games download IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbNSIP.Focus();
+                        tbNSIP.SelectAll();
                         return;
                     }
                 }
@@ -635,6 +640,7 @@ namespace XboxDownload
                     {
                         MessageBox.Show("Incorrect EA games download IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbEAIP.Focus();
+                        tbEAIP.SelectAll();
                         return;
                     }
                 }
@@ -649,6 +655,7 @@ namespace XboxDownload
                     {
                         MessageBox.Show("Incorrect Battle games download IP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         tbBattleIP.Focus();
+                        tbBattleIP.SelectAll();
                         return;
                     }
                 }
