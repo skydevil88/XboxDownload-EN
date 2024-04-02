@@ -10,6 +10,7 @@ namespace XboxDownload
         public const string homePage = "https://xbox.skydevil.xyz";
         public const string project = "https://github.com/skydevil88/XboxDownload-EN";
         private static readonly string[,] proxys = {
+            { "proxy", "https://py.skydevil.xyz/"},
             { "proxy", "https://py2.skydevil.xyz/"},
             { "direct", "" }
         };
