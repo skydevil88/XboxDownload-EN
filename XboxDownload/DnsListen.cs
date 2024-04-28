@@ -440,14 +440,14 @@ namespace XboxDownload
             foreach (DataRow dr in dt.Rows)
             {
                 if (!Convert.ToBoolean(dr["Enable"])) continue;
-                string? hostName = dr["HostName"].ToString()?.Trim().ToLower();
-                if (!string.IsNullOrEmpty(hostName) && IPAddress.TryParse(dr["IPv4"].ToString()?.Trim(), out IPAddress? ip))
+                string? host = dr["HostName"].ToString()?.Trim().ToLower();
+                if (!string.IsNullOrEmpty(host) && IPAddress.TryParse(dr["IPv4"].ToString()?.Trim(), out IPAddress? ip))
                 {
-                    if (hostName.StartsWith("*."))
+                    if (host.StartsWith("*."))
                     {
-                        hostName = Regex.Replace(hostName, @"^\*\.", "");
-                        Regex re = new("\\." + hostName.Replace(".", "\\.") + "$");
-                        if (!dicHosts2.ContainsKey(re) && reHosts.IsMatch(hostName))
+                        host = Regex.Replace(host, @"^\*\.", "");
+                        Regex re = new("\\." + host.Replace(".", "\\.") + "$");
+                        if (!dicHosts2.ContainsKey(re) && reHosts.IsMatch(host))
                         {
                             List<ResouceRecord> lsIp = new()
                             {
@@ -462,7 +462,7 @@ namespace XboxDownload
                             dicHosts2.TryAdd(re, lsIp);
                         }
                     }
-                    else if (!dicHosts1.ContainsKey(hostName) && reHosts.IsMatch(hostName))
+                    else
                     {
                         List<ResouceRecord> lsIp = new()
                         {
@@ -474,7 +474,7 @@ namespace XboxDownload
                                 QueryType = QueryType.A
                             }
                         };
-                        dicHosts1.TryAdd(hostName, lsIp);
+                        dicHosts1.TryAdd(host, lsIp);
                     }
                 }
             }

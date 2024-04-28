@@ -27,6 +27,11 @@ namespace XboxDownload
         private readonly DnsListen dnsListen;
         private readonly HttpListen httpListen;
         private readonly HttpsListen httpsListen;
+        private readonly ToolTip toolTip1 = new()
+        {
+            AutoPopDelay = 30000,
+            IsBalloon = true
+        };
 
         public Form1()
         {
@@ -55,18 +60,13 @@ namespace XboxDownload
             httpListen = new HttpListen(this);
             httpsListen = new HttpsListen(this);
 
-            ToolTip toolTip1 = new()
-            {
-                AutoPopDelay = 30000,
-                IsBalloon = true
-            };
             toolTip1.SetToolTip(this.labelDNS, "Public DNS Server\n1.1.1.1 (Cloudflare)\n4.2.2.2 (Level3)\n8.8.8.8 (Google)\n208.67.222.222 (OpenDNS)");
             toolTip1.SetToolTip(this.labelCom, "Xbox games download domain name\nxvcf1.xboxlive.com\nxvcf2.xboxlive.com\nassets1.xboxlive.com\nassets2.xboxlive.com\nd1.xboxlive.com\nd2.xboxlive.com\ndlassets.xboxlive.com\ndlassets2.xboxlive.com\nassets1.xboxlive.cn\nassets2.xboxlive.cn\nd1.xboxlive.cn\nd2.xboxlive.cn\ndlassets.xboxlive.cn\ndlassets2.xboxlive.cn");
             toolTip1.SetToolTip(this.labelApp, "Xbox apps download domain name\ndl.delivery.mp.microsoft.com\ntlu.dl.delivery.mp.microsoft.com");
             toolTip1.SetToolTip(this.labelPS, "Playstation games download domain name\ngst.prod.dl.playstation.net\ngs2.ww.prod.dl.playstation.net\nzeus.dl.playstation.net\nares.dl.playstation.net");
             toolTip1.SetToolTip(this.labelNS, "Nintendo switch games download domain name\natum.hac.lp1.d4c.nintendo.net\nbugyo.hac.lp1.eshop.nintendo.net\nctest-dl-lp1.cdn.nintendo.net\nctest-ul-lp1.cdn.nintendo.net");
             toolTip1.SetToolTip(this.labelEA, "EA games download domain name\norigin-a.akamaihd.net");
-            toolTip1.SetToolTip(this.labelBattle, "Blzddist games download domain name\nblzddist1-a.akamaihd.net\nblzddist2-a.akamaihd.net\nblzddist3-a.akamaihd.net");
+            toolTip1.SetToolTip(this.labelBattle, "Blzddist games download domain name\nblzddist1-a.akamaihd.net\nus.cdn.blizzard.com\neu.cdn.blizzard.com\nkr.cdn.blizzard.com\nlevel3.blizzard.com\nblizzard.gcdn.cloudn.co.kr");
             toolTip1.SetToolTip(this.ckbDoH, Thread.CurrentThread.CurrentCulture.Name != "zh-CN" ? "Use Google DNS over HTTPS (8.8.8.8) to resolve domain name IP." : "Use Alidns DNS over HTTPS (223.5.5.5) to resolve domain name IP.");
             toolTip1.SetToolTip(this.ckbSetDns, "Start listening, will set the computer DNS to the local IP and disable IPv6 DNS,\nRestore automatic settings after stop listening,\nconsole players no need to set.");
 
@@ -1090,6 +1090,16 @@ namespace XboxDownload
             dialog.Dispose();
         }
 
+        private void LabelTraffic_MouseEnter(object sender, EventArgs e)
+        {
+            if (adapter != null && adapter.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+            {
+                adapter = NetworkInterface.GetAllNetworkInterfaces().Where(s => s.Id == adapter!.Id).FirstOrDefault();
+                OldUp = OldDown = 0;
+            }
+            if (adapter != null) toolTip1.SetToolTip(this.labelTraffic, "Name£º" + adapter.Name + "\nDesc£º" + adapter.Description + "\nSpeed£º" + ClassMbr.ConvertBps(adapter.Speed));
+        }
+
         private void CkbRecordLog_CheckedChanged(object? sender, EventArgs? e)
         {
             Properties.Settings.Default.RecordLog = ckbRecordLog.Checked;
@@ -1358,6 +1368,18 @@ namespace XboxDownload
                             Parent = this.flpTestUrl
                         };
                         lb5.LinkClicked += new LinkLabelLinkClickedEventHandler(this.LinkTestUrl_LinkClicked);
+                        if (host == "AkamaiV6")
+                        {
+                            LinkLabel lbV6 = new()
+                            {
+                                Tag = "https://www.test-ipv6.com/",
+                                Text = "Test your IPv6",
+                                AutoSize = true,
+                                Parent = this.flpTestUrl,
+                                LinkColor = Color.Red
+                            };
+                            lbV6.LinkClicked += new LinkLabelLinkClickedEventHandler(this.Link_LinkClicked);
+                        }
                     }
                     break;
             }
@@ -1954,25 +1976,6 @@ namespace XboxDownload
             if (dgvHosts.Rows[e.RowIndex].IsNewRow) return;
             switch (dgvHosts.Columns[e.ColumnIndex].Name)
             {
-                case "Col_HostName":
-                    string? hostName = e.FormattedValue.ToString()?.Trim();
-                    if (!string.IsNullOrEmpty(hostName))
-                    {
-                        if (hostName.StartsWith("*."))
-                        {
-                            if (!DnsListen.reHosts.IsMatch(Regex.Replace(hostName, @"^\*\.", "")))
-                            {
-                                e.Cancel = true;
-                                dgvHosts.Rows[e.RowIndex].ErrorText = "Incorrect Hostname";
-                            }
-                        }
-                        else if (!DnsListen.reHosts.IsMatch(Regex.Replace((e.FormattedValue.ToString() ?? string.Empty).Trim().ToLower(), @"^(https?://)?([^/|:|\s]+).*$", "$2")))
-                        {
-                            e.Cancel = true;
-                            dgvHosts.Rows[e.RowIndex].ErrorText = "Incorrect Hostname";
-                        }
-                    }
-                    break;
                 case "Col_IPv4":
                     if (!string.IsNullOrWhiteSpace(e.FormattedValue.ToString()))
                     {
