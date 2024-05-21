@@ -2929,6 +2929,7 @@ namespace XboxDownload
                                                             bool find = false;
                                                             if (XboxGameDownload.dicXboxGame.TryGetValue(key, out XboxGameDownload.Products? XboxGame))
                                                             {
+                                                                item.SubItems[3].Tag = XboxGame.Url;
                                                                 item.SubItems[3].Text = Path.GetFileName(XboxGame.Url);
                                                                 if (XboxGame.FileSize == packages.MaxDownloadSizeInBytes)
                                                                     find = true;
@@ -2960,6 +2961,7 @@ namespace XboxDownload
                                                             bool find = false;
                                                             if (XboxGameDownload.dicXboxGame.TryGetValue(key, out XboxGameDownload.Products? XboxGame))
                                                             {
+                                                                item.SubItems[3].Tag = XboxGame.Url;
                                                                 item.SubItems[3].Text = Path.GetFileName(XboxGame.Url);
                                                                 if (XboxGame.FileSize == packages.MaxDownloadSizeInBytes)
                                                                     find = true;
@@ -3031,6 +3033,7 @@ namespace XboxDownload
                                                                 if (XboxGame.FileSize == packages.MaxDownloadSizeInBytes)
                                                                 {
                                                                     find = true;
+                                                                    item.SubItems[3].Tag = XboxGame.Url;
                                                                     item.SubItems[3].Text = Path.GetFileName(XboxGame.Url);
                                                                 }
                                                             }
@@ -3247,18 +3250,17 @@ namespace XboxDownload
                         {
                             succeed = true;
                             item.ForeColor = Color.Empty;
-                            item.SubItems[2].Text = ClassMbr.ConvertBytes(XboxGame.FileSize);
-                            item.SubItems[3].Text = Path.GetFileName(XboxGame.Url);
                         }
                         else
                         {
                             if (platform != 2)
                             {
                                 item.ForeColor = Color.Red;
-                                item.SubItems[2].Text = ClassMbr.ConvertBytes(XboxGame.FileSize);
-                                item.SubItems[3].Text = Path.GetFileName(XboxGame.Url);
                             }
                         }
+                        item.SubItems[2].Text = ClassMbr.ConvertBytes(XboxGame.FileSize);
+                        item.SubItems[3].Tag = XboxGame.Url;
+                        item.SubItems[3].Text = Path.GetFileName(XboxGame.Url);
                     }));
                 }
             }
@@ -3444,20 +3446,16 @@ namespace XboxDownload
                     if (item.Tag.ToString() == "Game")
                     {
                         if (Regex.IsMatch(item.SubItems[3].Text, @"^https?://"))
-                        {
                             item.SubItems[3].Text = Path.GetFileName(item.SubItems[3].Text);
-                        }
-                        else if (XboxGameDownload.dicXboxGame.TryGetValue(item.SubItems[2].Tag.ToString() ?? string.Empty, out XboxGameDownload.Products? XboxGame))
-                        {
-                            item.SubItems[3].Text = XboxGame.Url;
-                        }
+                        else
+                            item.SubItems[3].Text = item.SubItems[3].Tag.ToString();
                     }
                     else
                     {
                         if (Regex.IsMatch(item.SubItems[3].Text, @"^https?://"))
                         {
                             string expire = string.Empty;
-                            if (dicAppPackage.TryGetValue((item.SubItems[3].Tag.ToString() ?? string.Empty).ToLower(), out AppPackage? appPackage))
+                            if (!string.IsNullOrEmpty(item.SubItems[1].Text) && dicAppPackage.TryGetValue((item.SubItems[3].Tag.ToString() ?? string.Empty).ToLower(), out AppPackage? appPackage))
                             {
                                 Match result = Regex.Match(appPackage.Url, @"P1=(\d+)");
                                 if (result.Success) expire = " (Expire: " + DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(result.Groups[1].Value) * 1000).DateTime.ToLocalTime() + ")";
@@ -3476,12 +3474,14 @@ namespace XboxDownload
                     {
                         bool isGame = item.Tag.ToString() == "Game";
                         tsmCopyUrl.Visible = true;
+                        tsmCopyUrl2.Visible = isGame;
+                        tsmCopyUrl2.Enabled = isGame && Regex.IsMatch(item.SubItems[3].Tag.ToString() ?? string.Empty, @"http://[^\.]+\.xboxlive\.com/(\d{1,2}|Z)/");
                         tsmAllUrl.Visible = !isGame && lvGame.Tag != null && item.SubItems[0].Text == "Windows PC";
                         tsmAuthorization.Visible = false;
                     }
                     else
                     {
-                        tsmCopyUrl.Visible = tsmAllUrl.Visible = false;
+                        tsmCopyUrl.Visible = tsmCopyUrl2.Visible = tsmAllUrl.Visible = false;
                         tsmAuthorization.Visible = true;
                     }
                     cmsCopyUrl.Show(MousePosition.X, MousePosition.Y);
@@ -3495,10 +3495,7 @@ namespace XboxDownload
             ListViewItem item = lvGame.SelectedItems[0];
             if (item.Tag.ToString() == "Game")
             {
-                if (XboxGameDownload.dicXboxGame.TryGetValue(item.SubItems[2].Tag.ToString() ?? string.Empty, out XboxGameDownload.Products? XboxGame))
-                {
-                    url = XboxGame.Url;
-                }
+                url = item.SubItems[3].Tag.ToString() ?? string.Empty;
             }
             else
             {
@@ -3506,6 +3503,12 @@ namespace XboxDownload
                 {
                     url = appPackage.Url;
                 }
+            }
+            ToolStripMenuItem tsmi = (ToolStripMenuItem)sender;
+            if (tsmi.Name == "tsmCopyUrl2")
+            {
+                Match result = Regex.Match(url, @"http://[^\.]+\.xboxlive\.com/(\d{1,2}|Z)/(.+)");
+                if (result.Success) url = "http://xbasset" + result.Groups[1].Value.Replace("Z", "0") + ".blob.core.windows.net/" + result.Groups[2].Value;
             }
             Clipboard.SetDataObject(url);
             if (lvGame.SelectedItems[0].ForeColor == Color.Red)

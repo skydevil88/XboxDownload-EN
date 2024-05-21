@@ -301,6 +301,7 @@ namespace XboxDownload
             }
             if (Properties.Settings.Default.HttpService)
             {
+                dicService.TryAdd("packagespc.xboxlive.com", lsLocalIP);
                 dicService.TryAdd("www.msftconnecttest.com", lsLocalIP);
                 dicService.TryAdd("ctest.cdn.nintendo.net", lsLocalIP);
             }

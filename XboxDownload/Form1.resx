@@ -7444,6 +7444,12 @@ does not match the one stored in the block map. (re-download)</value>
   <data name="tsmCopyUrl.Text" xml:space="preserve">
     <value>Copy Link</value>
   </data>
+  <data name="tsmCopyUrl2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>267, 30</value>
+  </data>
+  <data name="tsmCopyUrl2.Text" xml:space="preserve">
+    <value>Copy Link (Azure)</value>
+  </data>
   <data name="tsmAllUrl.Size" type="System.Drawing.Size, System.Drawing">
     <value>267, 30</value>
   </data>
@@ -7469,7 +7475,7 @@ does not match the one stored in the block map. (re-download)</value>
     <value>Update Authorization</value>
   </data>
   <data name="cmsCopyUrl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>268, 94</value>
+    <value>268, 157</value>
   </data>
   <data name="&gt;&gt;cmsCopyUrl.Name" xml:space="preserve">
     <value>cmsCopyUrl</value>
@@ -8995,6 +9001,12 @@ does not match the one stored in the block map. (re-download)</value>
   </data>
   <data name="&gt;&gt;timerTraffic.Type" xml:space="preserve">
     <value>System.Windows.Forms.Timer, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tsmCopyUrl2.Name" xml:space="preserve">
+    <value>tsmCopyUrl2</value>
+  </data>
+  <data name="&gt;&gt;tsmCopyUrl2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>Form1</value>

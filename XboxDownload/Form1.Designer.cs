@@ -289,6 +289,7 @@
             tsmAuthorization1 = new ToolStripMenuItem();
             tsmAuthorization2 = new ToolStripMenuItem();
             timerTraffic = new System.Windows.Forms.Timer(components);
+            tsmCopyUrl2 = new ToolStripMenuItem();
             toolStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tabService.SuspendLayout();
@@ -2110,7 +2111,7 @@
             // cmsCopyUrl
             // 
             cmsCopyUrl.ImageScalingSize = new Size(24, 24);
-            cmsCopyUrl.Items.AddRange(new ToolStripItem[] { tsmCopyUrl, tsmAllUrl, tsmAuthorization });
+            cmsCopyUrl.Items.AddRange(new ToolStripItem[] { tsmCopyUrl, tsmCopyUrl2, tsmAllUrl, tsmAuthorization });
             cmsCopyUrl.Name = "cmsCopyUrl";
             resources.ApplyResources(cmsCopyUrl, "cmsCopyUrl");
             // 
@@ -2149,6 +2150,12 @@
             // 
             timerTraffic.Interval = 1000;
             timerTraffic.Tick += TimerTraffic_Tick;
+            // 
+            // tsmCopyUrl2
+            // 
+            tsmCopyUrl2.Name = "tsmCopyUrl2";
+            resources.ApplyResources(tsmCopyUrl2, "tsmCopyUrl2");
+            tsmCopyUrl2.Click += TsmCopyUrl_Click;
             // 
             // Form1
             // 
@@ -2476,5 +2483,6 @@
         private DataGridViewTextBoxColumn Col_Speed;
         private Label labelTraffic;
         private System.Windows.Forms.Timer timerTraffic;
+        private ToolStripMenuItem tsmCopyUrl2;
     }
 }
