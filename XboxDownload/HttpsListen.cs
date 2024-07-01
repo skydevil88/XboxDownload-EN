@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json;
+using System.Security.Cryptography;
 
 namespace XboxDownload
 {
@@ -18,7 +19,13 @@ namespace XboxDownload
         public HttpsListen(Form1 parentForm)
         {
             this.parentForm = parentForm;
-            this.certificate = new X509Certificate2(Properties.Resource.Certificate2);
+            using var rsa = RSA.Create(2048);
+            var req = new CertificateRequest("CN=XboxDownload", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            var sanBuilder = new SubjectAlternativeNameBuilder();
+            sanBuilder.AddDnsName("packagespc.xboxlive.com");
+            req.CertificateExtensions.Add(sanBuilder.Build());
+            var cert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(10));
+            this.certificate = new(cert.Export(X509ContentType.Pfx));
         }
 
         public void Listen()
@@ -42,9 +49,8 @@ namespace XboxDownload
             }
 
             X509Store store = new(StoreName.Root, StoreLocation.LocalMachine);
-            X509Certificate2 certificate = new(Properties.Resource.Certificate1);
             store.Open(OpenFlags.ReadWrite);
-            store.Add(certificate);
+            store.Add(this.certificate);
             store.Close();
 
             while (Form1.bServiceFlag)
@@ -238,7 +244,7 @@ namespace XboxDownload
                                                                 };
                                                                 XboxGameDownload.dicXboxGame.AddOrUpdate(key, XboxGame, (oldkey, oldvalue) => XboxGame);
                                                                 XboxGameDownload.SaveXboxGame();
-                                                                _ = ClassWeb.HttpResponseContent(UpdateFile.homePage + "/Game/AddGameUrl?url=" + ClassWeb.UrlEncode(XboxGame.Url), "PUT", null, null, null, 30000, "XboxDownload");
+                                                                _ = ClassWeb.HttpResponseContent(UpdateFile.website + "/Game/AddGameUrl?url=" + ClassWeb.UrlEncode(XboxGame.Url), "PUT", null, null, null, 30000, "XboxDownload");
                                                             }
                                                         }
                                                     }

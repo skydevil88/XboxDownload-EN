@@ -3203,7 +3203,7 @@ namespace XboxDownload
             XboxPackage.Game? json = null;
             if (!dicGetGamePackage.ContainsKey(key) || DateTime.Compare(dicGetGamePackage[key], DateTime.Now) < 0)
             {
-                string html = ClassWeb.HttpResponseContent(UpdateFile.homePage + "/Game/GetGamePackage?contentId=" + contentId + "&platform=" + platform, "GET", null, null, null, 30000, "XboxDownload");
+                string html = ClassWeb.HttpResponseContent(UpdateFile.website + "/Game/GetGamePackage?contentId=" + contentId + "&platform=" + platform, "GET", null, null, null, 30000, "XboxDownload");
                 if (Regex.IsMatch(html, @"^{.+}$", RegexOptions.Singleline))
                 {
                     try
@@ -3334,7 +3334,7 @@ namespace XboxDownload
                             item.SubItems[3].Text = Path.GetFileName(url);
                         }
                     }));
-                    if (Regex.IsMatch(url, @"^https?://")) _ = ClassWeb.HttpResponseContent(UpdateFile.homePage + "/Game/AddGameUrl?url=" + ClassWeb.UrlEncode(url), "PUT", null, null, null, 30000, "XboxDownload");
+                    if (Regex.IsMatch(url, @"^https?://")) _ = ClassWeb.HttpResponseContent(UpdateFile.website + "/Game/AddGameUrl?url=" + ClassWeb.UrlEncode(url), "PUT", null, null, null, 30000, "XboxDownload");
                 }
                 else if (platform == 2)
                 {
@@ -3355,7 +3355,7 @@ namespace XboxDownload
 
         private void GetAppPackage(string wuCategoryId, List<ListViewItem> lsAppItems)
         {
-            string html = ClassWeb.HttpResponseContent(UpdateFile.homePage + "/Game/GetAppPackage?WuCategoryId=" + wuCategoryId, "GET", null, null, null, 30000, "XboxDownload");
+            string html = ClassWeb.HttpResponseContent(UpdateFile.website + "/Game/GetAppPackage?WuCategoryId=" + wuCategoryId, "GET", null, null, null, 30000, "XboxDownload");
             XboxPackage.App? json = null;
             if (Regex.IsMatch(html, @"^{.+}$", RegexOptions.Singleline))
             {
@@ -3537,7 +3537,7 @@ namespace XboxDownload
             }
             Task.Factory.StartNew(() =>
             {
-                string html = ClassWeb.HttpResponseContent(UpdateFile.homePage + "/Game/GetAppPackage2?WuCategoryId=" + wuCategoryId, "GET", null, null, null, 30000, "XboxDownload");
+                string html = ClassWeb.HttpResponseContent(UpdateFile.website + "/Game/GetAppPackage2?WuCategoryId=" + wuCategoryId, "GET", null, null, null, 30000, "XboxDownload");
                 XboxPackage.App? json = null;
                 if (Regex.IsMatch(html, @"^{.+}$", RegexOptions.Singleline))
                 {
@@ -3988,7 +3988,7 @@ namespace XboxDownload
         private void ReInstallGamingServices()
         {
             XboxPackage.Data? data = null;
-            string html = ClassWeb.HttpResponseContent(UpdateFile.homePage + "/Game/GetAppPackage?WuCategoryId=f2ea4abe-4e1e-48ff-9022-a8a758303181", "GET", null, null, null, 30000, "XboxDownload");
+            string html = ClassWeb.HttpResponseContent(UpdateFile.website + "/Game/GetAppPackage?WuCategoryId=f2ea4abe-4e1e-48ff-9022-a8a758303181", "GET", null, null, null, 30000, "XboxDownload");
             if (Regex.IsMatch(html.Trim(), @"^{.+}$"))
             {
                 XboxPackage.App? json = null;

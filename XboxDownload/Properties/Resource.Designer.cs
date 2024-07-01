@@ -86,26 +86,6 @@ namespace XboxDownload.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] Certificate1 {
-            get {
-                object obj = ResourceManager.GetObject("Certificate1", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] Certificate2 {
-            get {
-                object obj = ResourceManager.GetObject("Certificate2", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-16&quot;?&gt;
         ///&lt;Task version=&quot;1.2&quot; xmlns=&quot;http://schemas.microsoft.com/windows/2004/02/mit/task&quot;&gt;
         ///  &lt;RegistrationInfo&gt;
