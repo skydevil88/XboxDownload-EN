@@ -230,17 +230,6 @@
             tbGameUrl = new TextBox();
             label32 = new Label();
             tabTools = new TabPage();
-            gpEACdn = new GroupBox();
-            linkLabel4 = new LinkLabel();
-            linkLabel3 = new LinkLabel();
-            linkEaOriginNoUpdate = new LinkLabel();
-            linkEaOriginRepair = new LinkLabel();
-            label51 = new Label();
-            labelStatusEACdn = new Label();
-            butEACdn = new Button();
-            rbEACdn2 = new RadioButton();
-            rbEACdn1 = new RadioButton();
-            rbEACdn0 = new RadioButton();
             gbGamingServices = new GroupBox();
             linkAppGamingServices = new LinkLabel();
             label50 = new Label();
@@ -284,12 +273,12 @@
             tsmSpeedTestLog = new ToolStripMenuItem();
             cmsCopyUrl = new ContextMenuStrip(components);
             tsmCopyUrl = new ToolStripMenuItem();
+            tsmCopyUrl2 = new ToolStripMenuItem();
             tsmAllUrl = new ToolStripMenuItem();
             tsmAuthorization = new ToolStripMenuItem();
             tsmAuthorization1 = new ToolStripMenuItem();
             tsmAuthorization2 = new ToolStripMenuItem();
             timerTraffic = new System.Windows.Forms.Timer(components);
-            tsmCopyUrl2 = new ToolStripMenuItem();
             toolStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tabService.SuspendLayout();
@@ -322,7 +311,6 @@
             ((System.ComponentModel.ISupportInitialize)pbGame).BeginInit();
             gbMicrosoftStore.SuspendLayout();
             tabTools.SuspendLayout();
-            gpEACdn.SuspendLayout();
             gbGamingServices.SuspendLayout();
             gbAddAppxPackage.SuspendLayout();
             contextMenuStrip1.SuspendLayout();
@@ -1747,97 +1735,11 @@
             // 
             // tabTools
             // 
-            tabTools.Controls.Add(gpEACdn);
             tabTools.Controls.Add(gbGamingServices);
             tabTools.Controls.Add(gbAddAppxPackage);
             resources.ApplyResources(tabTools, "tabTools");
             tabTools.Name = "tabTools";
             tabTools.UseVisualStyleBackColor = true;
-            // 
-            // gpEACdn
-            // 
-            gpEACdn.Controls.Add(linkLabel4);
-            gpEACdn.Controls.Add(linkLabel3);
-            gpEACdn.Controls.Add(linkEaOriginNoUpdate);
-            gpEACdn.Controls.Add(linkEaOriginRepair);
-            gpEACdn.Controls.Add(label51);
-            gpEACdn.Controls.Add(labelStatusEACdn);
-            gpEACdn.Controls.Add(butEACdn);
-            gpEACdn.Controls.Add(rbEACdn2);
-            gpEACdn.Controls.Add(rbEACdn1);
-            gpEACdn.Controls.Add(rbEACdn0);
-            resources.ApplyResources(gpEACdn, "gpEACdn");
-            gpEACdn.Name = "gpEACdn";
-            gpEACdn.TabStop = false;
-            // 
-            // linkLabel4
-            // 
-            resources.ApplyResources(linkLabel4, "linkLabel4");
-            linkLabel4.Name = "linkLabel4";
-            linkLabel4.TabStop = true;
-            linkLabel4.Tag = "https://origin.uptodown.com/windows/descargar";
-            linkLabel4.LinkClicked += Link_LinkClicked;
-            // 
-            // linkLabel3
-            // 
-            resources.ApplyResources(linkLabel3, "linkLabel3");
-            linkLabel3.Name = "linkLabel3";
-            linkLabel3.TabStop = true;
-            linkLabel3.Tag = "https://github.com/p0358/Fuck_off_EA_App";
-            linkLabel3.LinkClicked += Link_LinkClicked;
-            // 
-            // linkEaOriginNoUpdate
-            // 
-            resources.ApplyResources(linkEaOriginNoUpdate, "linkEaOriginNoUpdate");
-            linkEaOriginNoUpdate.Name = "linkEaOriginNoUpdate";
-            linkEaOriginNoUpdate.TabStop = true;
-            linkEaOriginNoUpdate.LinkClicked += LinkEaOriginNoUpdate_LinkClicked;
-            // 
-            // linkEaOriginRepair
-            // 
-            resources.ApplyResources(linkEaOriginRepair, "linkEaOriginRepair");
-            linkEaOriginRepair.Name = "linkEaOriginRepair";
-            linkEaOriginRepair.TabStop = true;
-            linkEaOriginRepair.LinkClicked += LinkEaOriginRepair_LinkClicked;
-            // 
-            // label51
-            // 
-            resources.ApplyResources(label51, "label51");
-            label51.Name = "label51";
-            // 
-            // labelStatusEACdn
-            // 
-            resources.ApplyResources(labelStatusEACdn, "labelStatusEACdn");
-            labelStatusEACdn.ForeColor = Color.Green;
-            labelStatusEACdn.Name = "labelStatusEACdn";
-            // 
-            // butEACdn
-            // 
-            resources.ApplyResources(butEACdn, "butEACdn");
-            butEACdn.Name = "butEACdn";
-            butEACdn.UseVisualStyleBackColor = true;
-            butEACdn.Click += ButEACdn_Click;
-            // 
-            // rbEACdn2
-            // 
-            resources.ApplyResources(rbEACdn2, "rbEACdn2");
-            rbEACdn2.Name = "rbEACdn2";
-            rbEACdn2.TabStop = true;
-            rbEACdn2.UseVisualStyleBackColor = true;
-            // 
-            // rbEACdn1
-            // 
-            resources.ApplyResources(rbEACdn1, "rbEACdn1");
-            rbEACdn1.Name = "rbEACdn1";
-            rbEACdn1.TabStop = true;
-            rbEACdn1.UseVisualStyleBackColor = true;
-            // 
-            // rbEACdn0
-            // 
-            resources.ApplyResources(rbEACdn0, "rbEACdn0");
-            rbEACdn0.Name = "rbEACdn0";
-            rbEACdn0.TabStop = true;
-            rbEACdn0.UseVisualStyleBackColor = true;
             // 
             // gbGamingServices
             // 
@@ -2121,6 +2023,12 @@
             resources.ApplyResources(tsmCopyUrl, "tsmCopyUrl");
             tsmCopyUrl.Click += TsmCopyUrl_Click;
             // 
+            // tsmCopyUrl2
+            // 
+            tsmCopyUrl2.Name = "tsmCopyUrl2";
+            resources.ApplyResources(tsmCopyUrl2, "tsmCopyUrl2");
+            tsmCopyUrl2.Click += TsmCopyUrl_Click;
+            // 
             // tsmAllUrl
             // 
             tsmAllUrl.Name = "tsmAllUrl";
@@ -2150,12 +2058,6 @@
             // 
             timerTraffic.Interval = 1000;
             timerTraffic.Tick += TimerTraffic_Tick;
-            // 
-            // tsmCopyUrl2
-            // 
-            tsmCopyUrl2.Name = "tsmCopyUrl2";
-            resources.ApplyResources(tsmCopyUrl2, "tsmCopyUrl2");
-            tsmCopyUrl2.Click += TsmCopyUrl_Click;
             // 
             // Form1
             // 
@@ -2211,8 +2113,6 @@
             gbMicrosoftStore.ResumeLayout(false);
             gbMicrosoftStore.PerformLayout();
             tabTools.ResumeLayout(false);
-            gpEACdn.ResumeLayout(false);
-            gpEACdn.PerformLayout();
             gbGamingServices.ResumeLayout(false);
             gbGamingServices.PerformLayout();
             gbAddAppxPackage.ResumeLayout(false);
@@ -2441,17 +2341,6 @@
         private ToolStripMenuItem tsmAuthorization2;
         private Label labelInstallationLocation;
         private LinkLabel linkFixAppxDrive;
-        private GroupBox gpEACdn;
-        private Button butEACdn;
-        private RadioButton rbEACdn2;
-        private RadioButton rbEACdn1;
-        private RadioButton rbEACdn0;
-        private Label label51;
-        private Label labelStatusEACdn;
-        private LinkLabel linkEaOriginRepair;
-        private LinkLabel linkEaOriginNoUpdate;
-        private LinkLabel linkLabel3;
-        private LinkLabel linkLabel4;
         private LinkLabel linkAppGamingServices;
         private CheckBox ckbGameLink;
         private DataGridViewTextBoxColumn Col_DeviceID;

@@ -16,7 +16,7 @@ namespace XboxDownload
 {
     internal class ClassWeb
     {
-        public static string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+        public static string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
         private static IHttpClientFactory? httpClientFactory;
 
         public static void HttpClientFactory()
@@ -473,40 +473,6 @@ namespace XboxDownload
                 default:
                     return buffer;
             }
-        }
-
-        internal static Object docLock = new();
-        internal static WebBrowser? webb = null;
-        internal static HtmlDocument? doc = null;
-
-        public static void SetHtmlDocument(string strHtml, bool executeScript)
-        {
-            if (Application.OpenForms[0].InvokeRequired)
-            {
-                Application.OpenForms[0].Invoke(new MethodInvoker(() => { SetHtmlDocument(strHtml, executeScript); }));
-                return;
-            }
-            if (!executeScript)
-            {
-                strHtml = Regex.Replace(strHtml, "<script", "<!--<script", RegexOptions.IgnoreCase);
-                strHtml = Regex.Replace(strHtml, "</script>", "</script>!-->", RegexOptions.IgnoreCase);
-            }
-            webb = new WebBrowser() { ScriptErrorsSuppressed = true };
-            webb.Navigate("about:blank");
-            doc = webb.Document.OpenNew(true);
-            doc.Write(strHtml);
-        }
-
-        public static void ObjectDisposed()
-        {
-            if (Application.OpenForms[0].InvokeRequired)
-            {
-                Application.OpenForms[0].Invoke(new MethodInvoker(() => { ObjectDisposed(); }));
-                return;
-            }
-            doc = null;
-            webb?.Dispose();
-            webb = null;
         }
     }
 
